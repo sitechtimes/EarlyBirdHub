@@ -69,13 +69,20 @@
             </div>
           </div>
         </a>
+          <a
+            :href="`https://www.youtube.com/playlist?list=PLXdwySAEBRBWocKBDaEE7HCw3rb3EvpeU`"
+            target="_blank"
+            class="text-center w-full flex items-center justify-center text-lg font-semibold text-white hover:underline border-2 border-gold py-2 px-4 rounded-md mt-3"
+            >
+            See past Early Birds on YouTube
+          </a>
         <div
-          class="grid grid-cols-2 grid-rows-2 buttons-container w-full mt-5 gap-5"
+          class="flex buttons-container w-full mt-5 gap-5"
         >
           <a
             href="https://docs.google.com/forms/d/e/1FAIpQLScT7wEZymQjetHzCAvl2tpN1Bxi7NEOknUiZ833R8R8ckl84g/viewform"
             target="_blank"
-            class="flex-1 border-2 font-semibold text-center items-center justify-center border-gold text-white py-2 px-4 rounded-md flex flex-col"
+            class="flex-1 border-2 font-semibold text-center items-center justify-center border-gold text-white hover:underline py-2 px-4 rounded-md flex flex-col"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -90,7 +97,7 @@
             Submit an Announcement
           </a>
           <a
-            class="font-semibold text-center flex-1 border-2 items-center border-gold text-white py-2 px-4 rounded-md flex flex-col"
+            class="font-semibold text-center flex-1 border-2 items-center border-gold text-white hover:underline py-2 px-4 rounded-md flex flex-col"
             href="https://docs.google.com/forms/d/e/1FAIpQLSfG87_bTafFrn62Yi-CbAYhYpMWvgjmeWC9c1lJgjpYavI7rg/viewform"
             target="_blank"
           >
@@ -133,14 +140,30 @@
             </svg>
             Submit a Sports Announcement
           </a>
+          <a class="font-semibold text-center flex-1 border-2 items-center border-gold text-white hover:underline py-2 px-4 rounded-md flex flex-col"
+            href="https://www.youtube.com/@SITMorningBroadcast"
+            target="_blank">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-10 h-10 text-gold"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="10" r="4" />
+              <path d="M2 20c0-4.418 4.03-8 9-8s9 3.582 9 8" fill="none" stroke="currentColor" stroke-width="2"/>
+              <path d="M17 8c1.657 0 3 1.343 3 3" fill="none" stroke="currentColor" stroke-width="2"/>
+              <path d="M17 5c3.314 0 6 2.686 6 6" fill="none" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Submit Name Pronunciation
+          </a>
         </div>
+
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Style } from "#components";
 import Seagull from "~/components/Seagull.vue";
 
 interface YouTubePlaylistItem {

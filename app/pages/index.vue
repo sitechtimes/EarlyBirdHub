@@ -1,30 +1,32 @@
 <template>
   <div class="mainpage w-full h-full items-center relative overflow-hidden">
-    <div class="absolute inset-0 pointer-events-none">
-      <Seagull
-        ref="seagull1"
-        class="md:visible invisible seagull seagull-1 scale-x-[-1]"
-        :style="{ '--random-y': randomY1 + '%' }"
-      />
-      <Seagull
-        ref="seagull2"
-        class="md:visible invisible seagull seagull-2 scale-x-[-1]"
-        :style="{ '--random-y': randomY2 + '%' }"
-      />
-      <Seagull
-        ref="seagull3"
-        class="md:visible invisible seagull seagull-3 scale-x-[-1]"
-        :style="{ '--random-y': randomY3 + '%' }"
-      />
-    </div>
+    <ClientOnly>
+      <div class="absolute inset-0 pointer-events-none">
+        <Seagull
+          ref="seagull1"
+          class="md:visible invisible seagull seagull-1 scale-x-[-1]"
+          :style="{ '--random-y': randomY1 + '%' }"
+        />
+        <Seagull
+          ref="seagull2"
+          class="md:visible invisible seagull seagull-2 scale-x-[-1]"
+          :style="{ '--random-y': randomY2 + '%' }"
+        />
+        <Seagull
+          ref="seagull3"
+          class="md:visible invisible seagull seagull-3 scale-x-[-1]"
+          :style="{ '--random-y': randomY3 + '%' }"
+        />
+      </div>
+    </ClientOnly>
 
     <div class="flex flex-col items-center mb-6 relative z-10">
       <h2 class="text-2xl font-bold text-center text-[#d7d4c8]">
         Today's Early Bird
       </h2>
-      <subtitle class="text-center text-gold">
+      <h3 class="text-center text-gold">
         Staten Island Tech Morning Broadcast
-      </subtitle>
+      </h3>
     </div>
 
     <div v-if="pending" class="text-center">
@@ -67,9 +69,13 @@
             </div>
           </div>
         </a>
-        <div class="buttons-container flex w-full mt-5 gap-5">
-          <button
-            class="flex-1 border-2 items-center justify-center border-gold text-white py-2 px-4 rounded-md flex flex-col"
+        <div
+          class="grid grid-cols-2 grid-rows-2 buttons-container w-full mt-5 gap-5"
+        >
+          <a
+            href="https://docs.google.com/forms/d/e/1FAIpQLScT7wEZymQjetHzCAvl2tpN1Bxi7NEOknUiZ833R8R8ckl84g/viewform"
+            target="_blank"
+            class="flex-1 border-2 font-semibold text-center items-center justify-center border-gold text-white py-2 px-4 rounded-md flex flex-col"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -82,13 +88,51 @@
               />
             </svg>
             Submit an Announcement
-          </button>
-          <button
-            class="flex-1 border-2 border-gold text-white py-2 px-4 rounded-md"
-            @click="() => refresh()"
+          </a>
+          <a
+            class="font-semibold text-center flex-1 border-2 items-center border-gold text-white py-2 px-4 rounded-md flex flex-col"
+            href="https://docs.google.com/forms/d/e/1FAIpQLSfG87_bTafFrn62Yi-CbAYhYpMWvgjmeWC9c1lJgjpYavI7rg/viewform"
+            target="_blank"
           >
-            Load Next Video
-          </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-10 h-10 text-gold"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                cx="12"
+                cy="14"
+                r="5"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"
+              />
+              <path
+                d="M7 4l5 7 5-7"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"
+              />
+              <rect
+                x="6"
+                y="2"
+                width="3"
+                height="4"
+                rx="1"
+                fill="currentColor"
+              />
+              <rect
+                x="15"
+                y="2"
+                width="3"
+                height="4"
+                rx="1"
+                fill="currentColor"
+              />
+            </svg>
+            Submit a Sports Announcement
+          </a>
         </div>
       </div>
     </div>
@@ -128,27 +172,40 @@ const {
   refresh,
 } = await useFetch<YouTubePlaylistResponse>("/api/playlist");
 
-const randomY1 = ref(Math.random() * 70 + 10);
-const randomY2 = ref(Math.random() * 70 + 10);
-const randomY3 = ref(Math.random() * 70 + 10);
+const randomY1 = ref(50);
+const randomY2 = ref(50);
+const randomY3 = ref(50);
+
+const isClient = ref(false);
 
 const updateRandomPositions = () => {
-  randomY1.value = Math.random() * 70 + 10;
-  randomY2.value = Math.random() * 70 + 10;
-  randomY3.value = Math.random() * 70 + 10;
+  if (isClient.value) {
+    randomY1.value = Math.random() * 70 + 10;
+    randomY2.value = Math.random() * 70 + 10;
+    randomY3.value = Math.random() * 70 + 10;
+  }
 };
 
 onMounted(() => {
+  isClient.value = true;
+  updateRandomPositions();
+
   setInterval(() => {
-    randomY1.value = Math.random() * 70 + 10;
+    if (isClient.value) {
+      randomY1.value = Math.random() * 70 + 10;
+    }
   }, 5000);
 
   setInterval(() => {
-    randomY2.value = Math.random() * 70 + 10;
+    if (isClient.value) {
+      randomY2.value = Math.random() * 70 + 10;
+    }
   }, 6000);
 
   setInterval(() => {
-    randomY3.value = Math.random() * 70 + 10;
+    if (isClient.value) {
+      randomY3.value = Math.random() * 70 + 10;
+    }
   }, 7000);
 });
 </script>

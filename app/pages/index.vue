@@ -1,5 +1,5 @@
 <template>
-  <div class="mainpage w-full h-full items-center relative overflow-hidden">
+  <div class="mainpage overflow-y-scroll w-full h-full items-center relative overflow-hidden">
     <ClientOnly>
       <div class="absolute inset-0 pointer-events-none">
         <Seagull
@@ -69,10 +69,11 @@
             </div>
           </div>
         </a>
-          <a
+        <a
             :href="`https://www.youtube.com/playlist?list=PLXdwySAEBRBWocKBDaEE7HCw3rb3EvpeU`"
             target="_blank"
-            class="text-center w-full flex items-center justify-center text-lg font-semibold text-white hover:underline border-2 border-gold py-2 px-4 rounded-md mt-3"
+            rel="noopener noreferrer"
+            class="button text-center w-full flex items-center justify-center text-lg font-semibold text-white border-2 border-gold py-2 px-4 rounded-md mt-3"
             >
             See past Early Birds on YouTube
           </a>
@@ -82,7 +83,7 @@
           <a
             href="https://docs.google.com/forms/d/e/1FAIpQLScT7wEZymQjetHzCAvl2tpN1Bxi7NEOknUiZ833R8R8ckl84g/viewform"
             target="_blank"
-            class="flex-1 border-2 font-semibold text-center items-center justify-center border-gold text-white hover:underline py-2 px-4 rounded-md flex flex-col"
+            class="button flex-1 border-2 font-semibold text-center items-center justify-center border-gold text-white py-2 px-4 rounded-md flex flex-col"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -97,7 +98,7 @@
             Submit an Announcement
           </a>
           <a
-            class="font-semibold text-center flex-1 border-2 items-center border-gold text-white hover:underline py-2 px-4 rounded-md flex flex-col"
+            class="button font-semibold text-center flex-1 border-2 items-center border-gold text-white py-2 px-4 rounded-md flex flex-col"
             href="https://docs.google.com/forms/d/e/1FAIpQLSfG87_bTafFrn62Yi-CbAYhYpMWvgjmeWC9c1lJgjpYavI7rg/viewform"
             target="_blank"
           >
@@ -140,7 +141,7 @@
             </svg>
             Submit a Sports Announcement
           </a>
-          <a class="font-semibold text-center flex-1 border-2 items-center border-gold text-white hover:underline py-2 px-4 rounded-md flex flex-col"
+          <a class="button font-semibold text-center flex-1 border-2 items-center border-gold text-white py-2 px-4 rounded-md flex flex-col"
             href="https://www.youtube.com/@SITMorningBroadcast"
             target="_blank">
             <svg

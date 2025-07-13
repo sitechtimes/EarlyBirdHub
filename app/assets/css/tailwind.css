@@ -16,13 +16,30 @@ body,
   box-sizing: border-box;
 }
 
-.button {
-  color: #FFF;
+.button-large {
+  color: #fff;
   transition: all 0.5s;
   position: relative;
+  font-weight: 600;
+  text-align: center;
+  flex: 1 1 0%;
+  border-width: 2px;
+  align-items: center;
+  border-color: #ffd700;
+  color: #fff;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border-radius: 0.1875rem;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  font-size: large;
 }
+
 .button::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -32,11 +49,11 @@ body,
   transition: all 0.3s;
 }
 .button:hover::before {
-  opacity: 0 ;
-  transform: scale(0.5,0.5);
+  opacity: 0;
+  transform: scale(0.5, 0.5);
 }
 .button::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -45,12 +62,90 @@ body,
   z-index: 1;
   opacity: 0;
   transition: all 0.3s;
-  border: 1px solid rgba(255,255,255,0.5);
-    background-color: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.2);
 
-  transform: scale(1.2,1.2);
+  transform: scale(1.2, 1.2);
 }
 .button:hover::after {
   opacity: 1;
-  transform: scale(1,1);
+  transform: scale(1, 1);
+}
+
+.button-large::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  transition: all 0.3s;
+}
+.button-large:hover::before {
+  opacity: 0;
+  transform: scale(0.5, 0.5);
+}
+.button-large::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  opacity: 0;
+  transition: all 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.2);
+
+  transform: scale(1.2, 1.2);
+}
+.button-large:hover::after {
+  opacity: 1;
+  transform: scale(1, 1);
+}
+
+.navbar {
+  animation: navbar-slide-in 0.3s forwards;
+  transition: transform 0.3s ease-in-out;
+}
+
+.navbar-slide-out {
+  animation: navbar-slide-out 0.3s forwards;
+}
+
+@keyframes navbar-slide-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes navbar-slide-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.spin {
+  animation: spin 0.3s ease-in-out;
+}
+
+.spinOut {
+  animation: spin 0.3s ease-in-out reverse;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(180deg);
+  }
 }

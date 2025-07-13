@@ -2,12 +2,17 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-05-15",
   devtools: {
-    enabled: true,
+    enabled: false, // Completely disable for mobile compatibility
     timeline: {
-      enabled: true,
+      enabled: false,
     },
   },
-  modules: ["@nuxtjs/tailwindcss", "daisyui", "@nuxtjs/google-fonts"],
+  modules: [
+    "@nuxtjs/tailwindcss",
+    "daisyui",
+    "@nuxtjs/google-fonts",
+    "@pinia/nuxt",
+  ],
   googleFonts: {
     families: {
       Inter: [400, 500, 600, 700],
@@ -20,6 +25,14 @@ export default defineNuxtConfig({
     display: "swap",
     preload: true,
   },
+  ssr: true,
+  app: {
+    head: {
+      viewport:
+        "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+      meta: [{ name: "format-detection", content: "telephone=no" }],
+    },
+  },
   nitro: {
     publicAssets: [
       {
@@ -31,5 +44,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     apiSecret: "",
+  },
+  pinia: {
+    storesDirs: ["./stores/**"],
   },
 });

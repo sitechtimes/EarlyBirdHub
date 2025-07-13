@@ -1,5 +1,7 @@
 <template>
-  <div class="mainpage overflow-y-scroll w-full h-full items-center relative overflow-hidden">
+  <div
+    class="mainpage overflow-y-scroll w-full h-full items-center relative overflow-hidden"
+  >
     <ClientOnly>
       <div class="absolute inset-0 pointer-events-none">
         <Seagull
@@ -20,7 +22,7 @@
       </div>
     </ClientOnly>
 
-    <div class="flex flex-col items-center mb-6 relative z-10">
+    <div class="flex flex-col items-center mb-6 relative">
       <h2 class="text-2xl font-bold text-center text-[#d7d4c8]">
         Today's Early Bird
       </h2>
@@ -46,17 +48,20 @@
         <a
           :href="`https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}`"
           target="_blank"
-          class="relative block group"
+          rel="noopener noreferrer"
+          class="relative block group overflow-hidden"
         >
           <img
             :src="item.snippet.thumbnails.maxres.url"
             :alt="item.snippet.title"
-            class="w-full object-cover rounded-md md:h-96 border-2 border-gold"
+            class="w-full h-auto object-cover rounded-md md:h-[32rem] border-2 border-gold block"
             loading="lazy"
           />
-          <div class="absolute inset-0 flex items-center justify-center">
+          <div
+            class="absolute inset-0 flex items-center justify-center pointer-events-none"
+          >
             <div
-              class="bg-black bg-opacity-60 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-opacity-80 transition-all duration-200"
+              class="bg-black bg-opacity-60 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-opacity-80 transition-all duration-200 pointer-events-auto"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -70,20 +75,23 @@
           </div>
         </a>
         <a
-            :href="`https://www.youtube.com/playlist?list=PLXdwySAEBRBWocKBDaEE7HCw3rb3EvpeU`"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="button text-center w-full flex items-center justify-center text-lg font-semibold text-white border-2 border-gold py-2 px-4 rounded-md mt-3"
-            >
-            See past Early Birds on YouTube
-          </a>
-        <div
-          class="flex buttons-container w-full mt-5 gap-5"
+          :href="`https://www.youtube.com/playlist?list=PLXdwySAEBRBWocKBDaEE7HCw3rb3EvpeU`"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="button md:mt-5 mt-3 md:h-fit h-[79px] flex flex-1 items-center justify-center flex-col text-center font-semibold text-xl border-2 border-gold text-white py-1 px-2 rounded transition-all duration-500 relative md:py-2 md:px-4 md:rounded-md"
         >
+          <span
+            >Click here to see
+            <span class="text-gold font-extrabold">past Early Birds</span> on
+            <span class="text-[#FF0000] font-extrabold">YouTube</span>
+          </span>
+        </a>
+        <div class="flex buttons-container w-full md:mt-5 mt-3 md:gap-5 gap-3">
           <a
             href="https://docs.google.com/forms/d/e/1FAIpQLScT7wEZymQjetHzCAvl2tpN1Bxi7NEOknUiZ833R8R8ckl84g/viewform"
             target="_blank"
-            class="button flex-1 border-2 font-semibold text-center items-center justify-center border-gold text-white py-2 px-4 rounded-md flex flex-col"
+            rel="noopener noreferrer"
+            class="button md:py-2 md:px-4 md:rounded-md flex flex-1 items-center justify-center flex-col text-center font-semibold md:text-xl text-xs border-2 border-gold text-white py-1 px-2 rounded transition-all duration-500 relative"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -98,9 +106,10 @@
             Submit an Announcement
           </a>
           <a
-            class="button font-semibold text-center flex-1 border-2 items-center border-gold text-white py-2 px-4 rounded-md flex flex-col"
+            class="button md:py-2 md:px-4 md:rounded-md flex flex-1 items-center justify-center flex-col text-center font-semibold md:text-xl text-xs border-2 border-gold text-white py-1 px-2 rounded transition-all duration-500 relative"
             href="https://docs.google.com/forms/d/e/1FAIpQLSfG87_bTafFrn62Yi-CbAYhYpMWvgjmeWC9c1lJgjpYavI7rg/viewform"
             target="_blank"
+            rel="noopener noreferrer"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -141,9 +150,12 @@
             </svg>
             Submit a Sports Announcement
           </a>
-          <a class="button font-semibold text-center flex-1 border-2 items-center border-gold text-white py-2 px-4 rounded-md flex flex-col"
+          <a
+            class="button md:py-2 md:px-4 md:rounded-md flex flex-1 items-center justify-center flex-col text-center font-semibold md:text-xl text-xs border-2 border-gold text-white py-1 px-2 rounded transition-all duration-500 relative"
             href="https://www.youtube.com/@SITMorningBroadcast"
-            target="_blank">
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="w-10 h-10 text-gold"
@@ -151,14 +163,28 @@
               viewBox="0 0 24 24"
             >
               <circle cx="12" cy="10" r="4" />
-              <path d="M2 20c0-4.418 4.03-8 9-8s9 3.582 9 8" fill="none" stroke="currentColor" stroke-width="2"/>
-              <path d="M17 8c1.657 0 3 1.343 3 3" fill="none" stroke="currentColor" stroke-width="2"/>
-              <path d="M17 5c3.314 0 6 2.686 6 6" fill="none" stroke="currentColor" stroke-width="2"/>
+              <path
+                d="M2 20c0-4.418 4.03-8 9-8s9 3.582 9 8"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <path
+                d="M17 8c1.657 0 3 1.343 3 3"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <path
+                d="M17 5c3.314 0 6 2.686 6 6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              />
             </svg>
             Submit Name Pronunciation
           </a>
         </div>
-
       </div>
     </div>
   </div>

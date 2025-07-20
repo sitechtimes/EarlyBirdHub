@@ -38,6 +38,10 @@ body,
   font-size: large;
 }
 
+.button {
+  background-color: black;
+}
+
 .button::before {
   content: "";
   position: absolute;

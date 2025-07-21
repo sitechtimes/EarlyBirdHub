@@ -1,13 +1,29 @@
 <template>
   <nav
-    class="h-screen w-fit text-white bg-black absolute top-0 left-0 flex flex-col shadow-lg navbar"
+    class="h-screen w-36 text-white bg-black absolute top-0 left-0 flex flex-col shadow-lg navbar"
     :class="{ 'navbar-slide-out': isClosing }"
     v-if="isOpen"
   >
     <ul class="list-none p-0 m-0 pt-14">
-      <li class="mb-6">
+      <li>
         <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700 transition"
           >Home</a
+        >
+      </li>
+      <li class="border-t-2 border-gray-700">
+        <a
+          href="#"
+          class="block break-words px-4 py-2 rounded hover:bg-gray-700 transition"
+          >Submit Name Pronunciation</a
+        >
+      </li>
+      <li class="border-t-2 border-gray-700">
+        <a
+          href="https://www.youtube.com/playlist?list=PLXdwySAEBRBWocKBDaEE7HCw3rb3EvpeU"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="block px-4 py-2 rounded hover:bg-gray-700 transition"
+          >See past Early Birds</a
         >
       </li>
     </ul>

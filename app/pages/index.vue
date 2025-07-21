@@ -74,18 +74,7 @@
             </div>
           </div>
         </a>
-        <a
-          :href="`https://www.youtube.com/playlist?list=PLXdwySAEBRBWocKBDaEE7HCw3rb3EvpeU`"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button md:mt-5 mt-3 md:h-fit h-[79px] flex flex-1 items-center justify-center flex-col text-center font-semibold text-xl border-2 border-gold text-white py-1 px-2 rounded transition-all duration-500 relative md:py-2 md:px-4 md:rounded-md"
-        >
-          <span
-            >Click here to see
-            <span class="text-gold font-extrabold">past Early Birds</span> on
-            <span class="text-[#FF0000] font-extrabold">YouTube</span>
-          </span>
-        </a>
+
         <div class="flex buttons-container w-full md:mt-5 mt-3 md:gap-5 gap-3">
           <a
             href="https://docs.google.com/forms/d/e/1FAIpQLScT7wEZymQjetHzCAvl2tpN1Bxi7NEOknUiZ833R8R8ckl84g/viewform"
@@ -95,7 +84,7 @@
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="w-10 h-10 text-gold"
+              class="w-10 h-1/2 text-gold"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -162,9 +151,9 @@
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="w-10 h-10 text-gold"
+              class="w-10 h-1/2 text-gold"
               fill="currentColor"
-              viewBox="0 0 28 24"
+              viewBox="0 0 28 28"
             >
               <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
               <g

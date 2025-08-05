@@ -143,11 +143,9 @@
               >Submit a Sports Announcement</span
             >
           </a>
-          <a
+          <NuxtLink
+            to="/dailylinks"
             class="button md:py-2 md:px-4 md:rounded-md flex flex-1 items-center justify-between flex-col text-center font-semibold md:text-xl text-xs border-2 border-gold text-white py-1 px-2 rounded transition-all duration-500 relative"
-            href="https://www.youtube.com/@SITMorningBroadcast"
-            target="_blank"
-            rel="noopener noreferrer"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -173,7 +171,7 @@
             <span class="h-1/2 justify-center flex items-center"
               >Daily Links</span
             >
-          </a>
+          </NuxtLink>
         </div>
       </div>
     </div>

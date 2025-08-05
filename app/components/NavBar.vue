@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="h-screen w-36 text-white bg-black absolute top-0 left-0 flex flex-col shadow-lg navbar"
+    class="h-screen break-words w-36 text-white bg-black absolute top-0 left-0 flex flex-col shadow-lg navbar"
     :class="{ 'navbar-slide-out': isClosing }"
     v-if="isOpen"
   >
@@ -11,9 +11,7 @@
         >
       </li>
       <li class="border-t-2 border-gray-700">
-        <a
-          href="#"
-          class="block break-words px-4 py-2 rounded hover:bg-gray-700 transition"
+        <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700 transition"
           >Submit Name Pronunciation</a
         >
       </li>
@@ -24,6 +22,14 @@
           rel="noopener noreferrer"
           class="block px-4 py-2 rounded hover:bg-gray-700 transition"
           >See past Early Birds</a
+        >
+      </li>
+      <li class="border-t-2 border-gray-700">
+        <a
+          href="_blank"
+          class="block px-4 py-2 rounded hover:bg-gray-700 transition"
+          rel="noopener noreferrer"
+          >School Calander</a
         >
       </li>
     </ul>

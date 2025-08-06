@@ -6,8 +6,10 @@
   >
     <ul class="list-none p-0 m-0 pt-14">
       <li>
-        <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700 transition"
-          >Home</a
+        <NuxtLink
+          to="/"
+          class="block px-4 py-2 rounded hover:bg-gray-700 transition"
+          >Home</NuxtLink
         >
       </li>
       <li class="border-t-2 border-gray-700">
@@ -52,6 +54,8 @@
 </template>
 
 <script setup>
+const router = useRouter();
+
 const navbarStore = useNavbarStore();
 const { windowWidth } = useWindowSize();
 
@@ -75,4 +79,13 @@ function toggleNavbar() {
     }, 300);
   }
 }
+
+watch(
+  () => router.currentRoute.value,
+  () => {
+    if (isOpen.value) {
+      toggleNavbar();
+    }
+  }
+);
 </script>

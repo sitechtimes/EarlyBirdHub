@@ -5,7 +5,7 @@ export const useUserStore = defineStore("user", () => {
   const loading = ref(false);
   const error = ref<string | null>(null);
   const user = ref(null);
-  const loggedIn = ref(false);
+  const loggedIn = ref(true);
   async function login({
     email,
     password,

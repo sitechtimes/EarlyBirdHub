@@ -1,179 +1,120 @@
 <template>
-  <div
-    class="min-h-screen w-full flex items-center justify-center bg-black text-gold px-4"
-    v-if="!LoggedIn"
-  >
-    <form
-      @submit.prevent="handleLogin"
-      class="bg-zinc-900 p-6 rounded-xl border border-gold w-full max-w-md space-y-4"
-    >
-      <h2 class="text-2xl font-bold text-center border-b border-gold pb-2">
-        Login
-      </h2>
+  <div class="min-h-screen bg-black text-gold p-6 space-y-10 w-full">
+    <div v-if="loggedIn">
+      <h1 class="text-3xl font-bold border-b border-gold pb-3 pt-3">
+        Manage Daily Links
+      </h1>
 
-      <label for="email">Email</label>
-      <input
-        id="email"
-        v-model="email"
-        type="email"
-        placeholder="Enter your email"
-        class="w-full bg-black border border-gold p-2 rounded"
-        required
-      />
-
-      <label for="password">Password</label>
-      <input
-        id="password"
-        v-model="password"
-        type="password"
-        placeholder="Enter your password"
-        class="w-full bg-black border border-gold p-2 rounded"
-        required
-      />
-
-      <div v-if="error" class="text-red-400 text-sm">{{ error }}</div>
-      <div v-if="success" class="text-green-400 text-sm">{{ success }}</div>
-
-      <button
-        type="submit"
-        class="w-full bg-gold text-black font-bold py-2 px-4 rounded"
+      <form
+        @submit.prevent="addLink"
+        class="grid grid-cols-1 md:grid-cols-2 gap-4"
       >
-        Login
-      </button>
-    </form>
-  </div>
+        <Input v-model="form.title" inputType="text" placeholder="Title" />
+        <Input v-model="form.url" inputType="text" placeholder="URL" />
+        <Input v-model="form.image" inputType="text" placeholder="Image URL" />
+        <Input
+          v-model="form.description"
+          inputType="text"
+          placeholder="Description"
+        />
+        <Input v-model="form.date" inputType="date" placeholder="Date" />
 
-  <div
-    class="min-h-screen bg-black text-gold p-6 space-y-10 md:w-3/4 mx-auto"
-    v-else
-  >
-    <h1 class="text-3xl font-bold border-b border-gold pb-3 pt-3">
-      Manage Daily Links
-    </h1>
+        <button
+          type="submit"
+          class="bg-gold text-black font-bold py-2 px-4 rounded self-end"
+        >
+          Add Link
+        </button>
+      </form>
 
-    <form
-      @submit.prevent="addLink"
-      class="grid grid-cols-1 md:grid-cols-2 gap-4"
-    >
-      <label for="title">Title</label>
-      <input
-        id="title"
-        v-model="form.title"
-        type="text"
-        placeholder="Title"
-        class="bg-zinc-900 p-2 rounded border border-gold"
-      />
+      <div v-if="links.length" class="space-y-6">
+        <h2 class="text-2xl font-semibold mt-10">Existing Links</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div
+            v-for="link in links"
+            :key="link.id"
+            class="border border-gold p-3 rounded-xl space-y-2 bg-zinc-950"
+          >
+            <img
+              v-if="link.image"
+              :src="link.image"
+              alt=""
+              class="w-full h-28 object-cover rounded"
+            />
+            <h3 class="font-bold text-lg">{{ link.title }}</h3>
+            <p class="text-sm text-gold/80">{{ link.description }}</p>
+            <a
+              :href="link.url"
+              target="_blank"
+              class="text-sm text-blue-400 underline break-words"
+              >{{ link.url }}</a
+            >
+            <p class="text-xs italic text-gold/60">
+              Until: {{ new Date(link.date).toDateString() }}
+            </p>
 
-      <label for="url">URL</label>
-      <input
-        id="url"
-        v-model="form.url"
-        type="url"
-        placeholder="URL"
-        class="bg-zinc-900 p-2 rounded border border-gold"
-      />
-
-      <label for="image">Image URL</label>
-      <input
-        id="image"
-        v-model="form.image"
-        type="text"
-        placeholder="Image URL"
-        class="bg-zinc-900 p-2 rounded border border-gold"
-      />
-
-      <label for="description">Description</label>
-      <input
-        id="description"
-        v-model="form.description"
-        type="text"
-        placeholder="Description"
-        class="bg-zinc-900 p-2 rounded border border-gold"
-      />
-
-      <label for="date">Date</label>
-      <input
-        id="date"
-        v-model="form.date"
-        type="date"
-        class="bg-zinc-900 p-2 rounded border border-gold"
-      />
-
-      <div></div>
-      <button
-        type="submit"
-        class="bg-gold text-black font-bold py-2 px-4 rounded self-end"
-      >
-        Add Link
-      </button>
-    </form>
-
-    <!-- Edit Modal -->
+            <div class="flex justify-end gap-2">
+              <button
+                @click="editLink(link)"
+                class="text-yellow-400 underline text-sm"
+              >
+                Edit
+              </button>
+              <button
+                @click="deleteLink(link.id)"
+                class="text-red-400 underline text-sm"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div
-      v-if="editing"
-      class="fixed inset-0 bg-black/80 flex items-center justify-center"
+      v-else
+      class="min-h-screen w-full flex items-center justify-center bg-black text-gold px-4"
     >
       <form
-        @submit.prevent="updateLink"
-        class="bg-zinc-900 p-6 rounded-xl border border-gold w-[90%] max-w-lg space-y-4"
+        @submit.prevent="handleLogin"
+        class="bg-zinc-900 p-6 rounded-xl border border-gold w-full max-w-md space-y-4"
       >
-        <h2 class="text-xl font-bold border-b border-gold pb-2">Edit Link</h2>
+        <h2 class="text-2xl font-bold text-center border-b border-gold pb-2">
+          Login
+        </h2>
 
-        <label for="edit-title">Title</label>
+        <label for="email">Email</label>
         <input
-          id="edit-title"
-          v-model="form.title"
-          type="text"
+          id="email"
+          v-model="email"
+          type="email"
+          placeholder="Enter your email"
           class="w-full bg-black border border-gold p-2 rounded"
+          required
         />
 
-        <label for="edit-url">URL</label>
+        <label for="password">Password</label>
         <input
-          id="edit-url"
-          v-model="form.url"
-          type="url"
+          id="password"
+          v-model="password"
+          type="password"
+          placeholder="Enter your password"
           class="w-full bg-black border border-gold p-2 rounded"
+          required
         />
 
-        <label for="edit-image">Image URL</label>
-        <input
-          id="edit-image"
-          v-model="form.image"
-          type="text"
-          class="w-full bg-black border border-gold p-2 rounded"
-        />
+        <div v-if="error" class="text-red-400 text-sm">{{ error }}</div>
+        <div v-if="success" class="text-green-400 text-sm">{{ success }}</div>
 
-        <label for="edit-description">Description</label>
-        <input
-          id="edit-description"
-          v-model="form.description"
-          type="text"
-          class="w-full bg-black border border-gold p-2 rounded"
-        />
-
-        <label for="edit-date">Date</label>
-        <input
-          id="edit-date"
-          v-model="form.date"
-          type="date"
-          class="w-full bg-black border border-gold p-2 rounded"
-        />
-
-        <div class="flex justify-between">
-          <button
-            type="submit"
-            class="bg-gold text-black px-4 py-2 rounded font-bold"
-          >
-            Save
-          </button>
-          <button @click="cancelEdit" class="text-gold underline px-4 py-2">
-            Cancel
-          </button>
-        </div>
+        <button
+          type="submit"
+          class="w-full bg-gold text-black font-bold py-2 px-4 rounded"
+        >
+          Login
+        </button>
       </form>
     </div>
 
-    <!-- Edit Modal -->
     <div
       v-if="editing"
       class="fixed inset-0 bg-black/80 flex items-center justify-center"
@@ -183,31 +124,15 @@
         class="bg-zinc-900 p-6 rounded-xl border border-gold w-[90%] max-w-lg space-y-4"
       >
         <h2 class="text-xl font-bold border-b border-gold pb-2">Edit Link</h2>
-        <input
-          v-model="form.title"
-          type="text"
-          class="w-full bg-black border border-gold p-2 rounded"
-        />
-        <input
-          v-model="form.url"
-          type="url"
-          class="w-full bg-black border border-gold p-2 rounded"
-        />
-        <input
-          v-model="form.image"
-          type="text"
-          class="w-full bg-black border border-gold p-2 rounded"
-        />
-        <input
+        <Input v-model="form.title" inputType="text" placeholder="Title" />
+        <Input v-model="form.url" inputType="text" placeholder="URL" />
+        <Input v-model="form.image" inputType="text" placeholder="Image URL" />
+        <Input
           v-model="form.description"
-          type="text"
-          class="w-full bg-black border border-gold p-2 rounded"
+          inputType="text"
+          placeholder="Description"
         />
-        <input
-          v-model="form.date"
-          type="date"
-          class="w-full bg-black border border-gold p-2 rounded"
-        />
+        <Input v-model="form.date" inputType="date" placeholder="Date" />
         <div class="flex justify-between">
           <button
             type="submit"
@@ -224,14 +149,13 @@
   </div>
 </template>
 
-<script setup>
-const email = ref("");
-const password = ref("");
+<script setup lang="ts">
+const userStore = useUserStore();
+const loggedIn = computed(() => userStore.loggedIn);
 const error = ref("");
 const success = ref("");
-
-const userStore = useUserStore();
-const LoggedIn = computed(() => userStore.loggedIn);
+const email = ref("");
+const password = ref("");
 
 async function handleLogin() {
   error.value = "";
@@ -241,7 +165,7 @@ async function handleLogin() {
     const res = await fetch("http://100.101.65.108:8000/api/users/");
     const users = await res.json();
 
-    const user = users.find((u) => u.email === email.value);
+    const user = users.find((u: User) => u.email === email.value);
 
     if (user) {
       success.value = "Login successful!";
@@ -255,7 +179,7 @@ async function handleLogin() {
   }
 }
 
-const links = [
+const links = ref<DailyLink[]>([
   {
     id: 1,
     title: "School Spirit Day Flyer",
@@ -353,19 +277,8 @@ const links = [
     description: "Help out at upcoming school events.",
     date: new Date("2025/08/05").toDateString(),
   },
-];
-const today = new Date();
-const groupedLinks = [
-  {
-    title: "Today’s Links",
-    links: links.filter((link) => link.date === today.toDateString()),
-  },
+]);
 
-  {
-    title: "Earlier Links",
-    links: links.filter((link) => link.date !== today.toDateString()),
-  },
-];
 const nextId = ref(1);
 
 const form = ref({

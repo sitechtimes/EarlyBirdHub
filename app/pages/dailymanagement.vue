@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-black text-gold p-6">
     <!-- Login Form -->
-    <div v-if="!loggedIn" class="min-h-screen flex items-center justify-center">
+    <div v-if="loggedIn" class="min-h-screen flex items-center justify-center">
       <form
         @submit.prevent="handleLogin"
         class="bg-zinc-900 p-6 rounded-xl border border-gold w-full max-w-md space-y-4"

@@ -5,14 +5,14 @@
         <h1
           @click="createNew = true"
           ref="tab1"
-          class="text-3xl font-bold cursor-pointer pb-2 pt-3"
+          class="text-[150%] font-bold cursor-pointer pb-2 pt-3"
         >
           Manage Daily Links
         </h1>
         <h1
           @click="createNew = false"
           ref="tab2"
-          class="text-3xl font-bold cursor-pointer pb-2 pt-3"
+          class="text-[150%] font-bold cursor-pointer pb-2 pt-3"
         >
           Existing Links
         </h1>
@@ -32,7 +32,7 @@
         <h3 class="font-bold text-2xl">Link Form</h3>
 
         <Input
-          class="w-[80%] border-gray-300 focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
+          class="w-[80%] border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
           v-model="form.title"
           inputType="text"
           placeholder="Title"
@@ -41,13 +41,13 @@
           v-model="form.url"
           inputType="text"
           placeholder="URL"
-          class="w-[80%] border-gray-300 focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
+          class="w-[80%] border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
         />
         <Input
           v-model="form.image"
           inputType="text"
           placeholder="Image URL"
-          class="w-[80%] border-gray-300 focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
+          class="w-[80%] border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
         />
         <div class="w-[80%]">
           <VueDatePicker v-model="form.date" text-input class="w-full" />
@@ -71,7 +71,7 @@
           <div
             v-for="link in links"
             :key="link.id"
-            class="border border-gold p-3 rounded-xl space-y-2 bg-zinc-950"
+            class="border border-gold p-3 rounded-xl space-y-2 bg-zinc-950 hover:-translate-y-5 transform duration-300 transition-all"
           >
             <img
               v-if="link.image"
@@ -91,18 +91,32 @@
               Until: {{ new Date(link.date).toDateString() }}
             </p>
 
-            <div class="flex justify-end gap-2">
+            <div class="flex justify-end gap-2 w-full">
               <button
                 @click="editLink(link)"
-                class="text-yellow-400 underline text-sm"
+                class="text-black cursor-pointer py-2 w-full bg-gold rounded-full"
               >
                 Edit
               </button>
               <button
                 @click="deleteLink(link.id)"
-                class="text-red-400 underline text-sm"
+                class="relative group cursor-pointer flex-col h-10 aspect-square bg-gold rounded-full gap-[1px] flex items-center justify-center"
               >
-                Delete
+                <div
+                  class="flex flex-col items-center justify-center transition-all duration-200 group-hover:-translate-y-[2px]"
+                >
+                  <span
+                    class="w-3 h-1 bg-black rounded-sm transform"
+                    style="
+                      clip-path: polygon(20% 40%, 80% 40%, 100% 100%, 0% 100%);
+                    "
+                  ></span>
+                  <span class="w-5 h-1 bg-black rounded"></span>
+                </div>
+                <div
+                  class="w-4 h-[18px] bg-black rounded-b-[4px] transition-transform duration-300"
+                  style="clip-path: polygon(0% 0%, 100% 0%, 95% 100%, 5% 100%)"
+                ></div>
               </button>
             </div>
           </div>
@@ -159,9 +173,21 @@
     >
       <form
         @submit.prevent="updateLink"
-        class="bg-zinc-900 p-6 rounded-xl border border-gold w-[90%] max-w-lg space-y-4"
+        class="bg-zinc-900 p-8 flex flex-col rounded-xl bg-white/10 backdrop-blur border border-gold w-[90%] max-w-lg space-y-4"
       >
-        <h2 class="text-xl font-bold border-b border-gold pb-2">Edit Link</h2>
+        <div
+          class="border-b border-gold p-2 flex items-center w-full justify-between"
+        >
+          <h2 class="text-xl font-bold">Edit Link</h2>
+          <button @click="cancelEdit" class="flex items-center px-4 py-2">
+            <span
+              class="absolute w-6 h-1 bg-white rounded-sm rotate-45 origin-center"
+            ></span>
+            <span
+              class="absolute w-6 h-1 bg-white rounded-sm -rotate-45 origin-center"
+            ></span>
+          </button>
+        </div>
         <Input v-model="form.title" inputType="text" placeholder="Title" />
         <Input v-model="form.url" inputType="text" placeholder="URL" />
         <Input v-model="form.image" inputType="text" placeholder="Image URL" />
@@ -171,15 +197,12 @@
           placeholder="Description"
         />
         <Input v-model="form.date" inputType="date" placeholder="Date" />
-        <div class="flex justify-between">
+        <div class="flex self-end">
           <button
             type="submit"
             class="bg-gold text-black px-4 py-2 rounded font-bold"
           >
             Save
-          </button>
-          <button @click="cancelEdit" class="text-gold underline px-4 py-2">
-            Cancel
           </button>
         </div>
       </form>

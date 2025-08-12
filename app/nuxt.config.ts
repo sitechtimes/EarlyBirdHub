@@ -44,6 +44,9 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     apiSecret: "",
+    sanityProjectId: "",
+    sanityDataset: "",
+    sanityWriteToken: "",
   },
   pinia: {
     storesDirs: ["./stores/**"],

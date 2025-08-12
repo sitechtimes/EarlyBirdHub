@@ -197,17 +197,15 @@
               <div class="flex gap-2">
                 <button
                   @click="handleApprove(action._id)"
-                  :disabled="isProcessing"
-                  class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
                 >
-                  {{ isProcessing ? "⏳" : "✅" }} Approve
+                  ✅ Approve
                 </button>
                 <button
                   @click="handleReject(action._id)"
-                  :disabled="isProcessing"
-                  class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
                 >
-                  {{ isProcessing ? "⏳" : "❌" }} Reject
+                  ❌ Reject
                 </button>
               </div>
             </div>
@@ -329,7 +327,6 @@ const email = ref("");
 const password = ref("");
 const editing = ref(false);
 const isUploading = ref(false);
-const isProcessing = ref(false); // Add processing state
 const selectedFile = ref<File | null>(null);
 
 const form = ref({
@@ -475,52 +472,24 @@ async function handleDelete(id: string) {
 }
 
 async function handleApprove(actionId: string) {
-  if (isProcessing.value) return; // Prevent double-clicks
-
-  isProcessing.value = true;
-  clearMessages();
-
   try {
-    console.log("Approving action:", actionId);
     const result = await approveAction(actionId);
-    console.log("Approval result:", result);
-
     success.value = "Action approved successfully";
-
-    // Force refresh both views with a small delay to ensure backend is updated
-    setTimeout(async () => {
-      await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
-      console.log("Views refreshed after approval");
-    }, 500);
+    await fetchStaffLinks();
+    await fetchPendingActions();
   } catch (err) {
     error.value = "Failed to approve action";
     console.error("Approve error:", err);
-  } finally {
-    isProcessing.value = false;
   }
 }
 
 async function handleReject(actionId: string) {
-  if (isProcessing.value) return; // Prevent double-clicks
-
-  isProcessing.value = true;
-  clearMessages();
-
   try {
-    console.log("Rejecting action:", actionId);
     await rejectAction(actionId);
     success.value = "Action rejected successfully";
-
-    // Refresh pending actions
-    setTimeout(async () => {
-      await fetchPendingActions();
-      console.log("Pending actions refreshed after rejection");
-    }, 500);
+    await fetchPendingActions();
   } catch (err) {
     error.value = "Failed to reject action";
-    console.error("Reject error:", err);
-  } finally {
-    isProcessing.value = false;
   }
 }
 </script>

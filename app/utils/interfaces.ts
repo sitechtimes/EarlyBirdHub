@@ -4,7 +4,8 @@ export interface DailyLink {
   url?: string;
   image?: string;
   description?: string;
-  date: string;
+  date_end: string;
+  date_uploaded: string;
 }
 
 export interface User {

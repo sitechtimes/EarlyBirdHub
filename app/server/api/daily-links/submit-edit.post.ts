@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Create a new pending edit request
+    // Note: Image is already uploaded and processed by frontend, just use the provided data
     const newEditRequest = await client.create({
       _type: "dailyLink",
       ...editData,

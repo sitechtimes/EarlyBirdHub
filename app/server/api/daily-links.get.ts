@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   });
 
   const query_params = getQuery(event);
-  const view = query_params.view; // 'staff' or 'admin'
+  const view = query_params.view; // 'staff', 'admin', or 'rejected'
 
   let query;
 
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
       "imageUrl": image.asset->url
     }`;
   } else if (view === "admin") {
-    // Admin sees all pending items for approval
+    // Admin sees all pending items for approval with original document data for edits
     query = `*[_type == "dailyLink" && status == "pending"] | order(_createdAt desc) {
       _id,
       name,
@@ -40,7 +40,34 @@ export default defineEventHandler(async (event) => {
       status,
       action_type,
       target_document_id,
-      "imageUrl": image.asset->url
+      "imageUrl": image.asset->url,
+      "originalDocument": *[_type == "dailyLink" && _id == ^.target_document_id && status == "approved"][0] {
+        _id,
+        name,
+        description,
+        url,
+        date_end,
+        date_uploaded,
+        "imageUrl": image.asset->url
+      },
+      _createdAt,
+      _updatedAt
+    }`;
+  } else if (view === "rejected") {
+    // Admin sees all rejected items
+    query = `*[_type == "dailyLink" && status == "rejected"] | order(_updatedAt desc) {
+      _id,
+      name,
+      description,
+      url,
+      date_end,
+      date_uploaded,
+      status,
+      action_type,
+      target_document_id,
+      "imageUrl": image.asset->url,
+      _createdAt,
+      _updatedAt
     }`;
   } else {
     // Default: return all

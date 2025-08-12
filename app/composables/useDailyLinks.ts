@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 export function useDailyLinks() {
   const staffLinks = ref<Array<any>>([]);
   const pendingActions = ref<Array<any>>([]);
+  const rejectedActions = ref<Array<any>>([]);
 
   // Fetch approved links for staff view
   const fetchStaffLinks = async () => {
@@ -19,6 +20,17 @@ export function useDailyLinks() {
       pendingActions.value = await $fetch<any[]>("/api/daily-links?view=admin");
     } catch (error) {
       console.error("Failed to fetch pending actions:", error);
+    }
+  };
+
+  // Fetch rejected actions for admin view
+  const fetchRejectedActions = async () => {
+    try {
+      rejectedActions.value = await $fetch<any[]>(
+        "/api/daily-links?view=rejected"
+      );
+    } catch (error) {
+      console.error("Failed to fetch rejected actions:", error);
     }
   };
 
@@ -96,18 +108,42 @@ export function useDailyLinks() {
       method: "POST",
     });
     await fetchPendingActions();
+    await fetchRejectedActions();
+    return res;
+  }
+
+  // Admin: Unreject action (put back to pending)
+  async function unrejectAction(actionId: string) {
+    const res = await $fetch(`/api/daily-links/${actionId}/unreject`, {
+      method: "POST",
+    });
+    await fetchPendingActions();
+    await fetchRejectedActions();
+    return res;
+  }
+
+  // Admin: Cleanup old rejected items
+  async function cleanupOldRejected() {
+    const res = await $fetch("/api/daily-links/cleanup", {
+      method: "POST",
+    });
+    await fetchRejectedActions();
     return res;
   }
 
   return {
     staffLinks,
     pendingActions,
+    rejectedActions,
     fetchStaffLinks,
     fetchPendingActions,
+    fetchRejectedActions,
     createLink,
     submitEditRequest,
     submitDeleteRequest,
     approveAction,
     rejectAction,
+    unrejectAction,
+    cleanupOldRejected,
   };
 }

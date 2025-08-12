@@ -47,6 +47,10 @@ export default defineNuxtConfig({
     sanityProjectId: "",
     sanityDataset: "",
     sanityWriteToken: "",
+    public: {
+      supabaseUrl: "",
+      supabaseAnonKey: "",
+    },
   },
   pinia: {
     storesDirs: ["./stores/**"],

@@ -555,8 +555,8 @@ const {
 } = useDailyLinks();
 
 const { uploadImage } = useSanityUpload();
-const userStore = useUserStore();
-const loggedIn = computed(() => userStore.loggedIn);
+const authStore = useAuthStore();
+const loggedIn = computed(() => authStore.user !== null);
 
 // State
 const userMode = ref<"staff" | "admin" | "rejected">("staff");
@@ -640,7 +640,7 @@ function cancelEdit() {
 
 async function handleLogin() {
   try {
-    await userStore.login({ email: email.value, password: password.value });
+    await authStore.signIn({ email: email.value, password: password.value });
     clearMessages();
   } catch (err) {
     error.value = "Login failed. Please check your credentials.";

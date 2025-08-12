@@ -1,0 +1,44 @@
+import { defineStore } from "pinia";
+import { ref } from "vue";
+
+export const useAuthStore = defineStore("auth", () => {
+  const user = ref<any>(null);
+
+  const fetchUser = async () => {
+    const { $supabase } = useNuxtApp();
+    const { data } = await $supabase.auth.getUser();
+    user.value = data.user;
+  };
+
+  const signIn = async (email: string, password: string) => {
+    const { $supabase } = useNuxtApp();
+    const { data, error } = await $supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw error;
+    user.value = data.user;
+    console.log("User signed in:", user.value);
+  };
+
+  const signOut = async () => {
+    const { $supabase } = useNuxtApp();
+    await $supabase.auth.signOut();
+    user.value = null;
+  };
+
+  const listenToAuthChanges = () => {
+    const { $supabase } = useNuxtApp();
+    $supabase.auth.onAuthStateChange((_, session) => {
+      user.value = session?.user ?? null;
+    });
+  };
+
+  return {
+    user,
+    fetchUser,
+    signIn,
+    signOut,
+    listenToAuthChanges,
+  };
+});

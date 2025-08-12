@@ -1,44 +1,61 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import { supabase } from "~/supabaseClient";
 
 export const useAuthStore = defineStore("auth", () => {
   const user = ref<any>(null);
 
-  const fetchUser = async () => {
-    const { $supabase } = useNuxtApp();
-    const { data } = await $supabase.auth.getUser();
-    user.value = data.user;
-  };
-
-  const signIn = async (email: string, password: string) => {
-    const { $supabase } = useNuxtApp();
-    const { data, error } = await $supabase.auth.signInWithPassword({
-      email,
-      password,
+  async function signInWithEmail(email: string, password: string) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
     });
-    if (error) throw error;
+    if (error) {
+      console.error("Error signing in:", error);
+      return null;
+    }
     user.value = data.user;
-    console.log("User signed in:", user.value);
-  };
+    return user.value;
+  }
 
-  const signOut = async () => {
-    const { $supabase } = useNuxtApp();
-    await $supabase.auth.signOut();
-    user.value = null;
-  };
+  async function manageLink(name: string, action_type: string, url?: string, description?: string, image?: File, oldID?: string) {
+    try {   //needs testing
+      if (image) {
+        image = await addImgToBucket(image) as unknown as File;
+      }
+      const { data, error} = await supabase
+      .from('daily-links')
+      .insert({
+        name: name, 
+        action_type: action_type, 
+        url: url? url : null, 
+        description: description? description : null, 
+        image: image? image : null, 
+        oldID: oldID? oldID : null})
+      .select()
+      .single();
+      return data;
+      // stuff ---> whatever you want to do after the insert
+  } catch (error) {
+      console.error('Error managing link:', error);
+  }
+  }
+  async function addImgToBucket(file: File) {
+    try {   //needs testing - copilot wrote this
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
 
-  const listenToAuthChanges = () => {
-    const { $supabase } = useNuxtApp();
-    $supabase.auth.onAuthStateChange((_, session) => {
-      user.value = session?.user ?? null;
-    });
-  };
+      let { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
 
-  return {
-    user,
-    fetchUser,
-    signIn,
-    signOut,
-    listenToAuthChanges,
-  };
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = supabase.storage.from('images').getPublicUrl(filePath);
+      return data.publicUrl;
+    }
+  }
 });

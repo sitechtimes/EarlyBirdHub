@@ -1,33 +1,71 @@
 <template>
   <div class="min-h-screen bg-black text-gold p-6 space-y-10 w-full">
-    <div v-if="loggedIn">
-      <h1 class="text-3xl font-bold border-b border-gold pb-3 pt-3">
-        Manage Daily Links
-      </h1>
+    <div class="w-full flex flex-col items-center" v-if="loggedIn">
+      <div class="relative flex justify-center w-full gap-4 mb-6">
+        <h1
+          @click="createNew = true"
+          ref="tab1"
+          class="text-3xl font-bold cursor-pointer pb-2 pt-3"
+        >
+          Manage Daily Links
+        </h1>
+        <h1
+          @click="createNew = false"
+          ref="tab2"
+          class="text-3xl font-bold cursor-pointer pb-2 pt-3"
+        >
+          Existing Links
+        </h1>
+
+        <!-- Sliding underline -->
+        <div
+          class="absolute bottom-0 h-[2px] bg-gold rounded transition-all duration-300"
+          :style="{ left: underlineLeft + 'px', width: underlineWidth + 'px' }"
+        ></div>
+      </div>
 
       <form
+        v-if="createNew == true"
         @submit.prevent="addLink"
-        class="grid grid-cols-1 md:grid-cols-2 gap-4"
+        class="flex flex-col items-center w-3/4 gap-4 bg-white p-5 rounded-3xl"
       >
-        <Input v-model="form.title" inputType="text" placeholder="Title" />
-        <Input v-model="form.url" inputType="text" placeholder="URL" />
-        <Input v-model="form.image" inputType="text" placeholder="Image URL" />
-        <Input
-          v-model="form.description"
-          inputType="text"
-          placeholder="Description"
-        />
-        <Input v-model="form.date" inputType="date" placeholder="Date" />
+        <h3 class="font-bold text-2xl">Link Form</h3>
 
+        <Input
+          class="w-[80%] border-gray-300 focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
+          v-model="form.title"
+          inputType="text"
+          placeholder="Title"
+        />
+        <Input
+          v-model="form.url"
+          inputType="text"
+          placeholder="URL"
+          class="w-[80%] border-gray-300 focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
+        />
+        <Input
+          v-model="form.image"
+          inputType="text"
+          placeholder="Image URL"
+          class="w-[80%] border-gray-300 focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
+        />
+        <div class="w-[80%]">
+          <VueDatePicker v-model="form.date" text-input class="w-full" />
+        </div>
+        <textarea
+          v-model="form.description"
+          placeholder="Description"
+          class="w-[80%] p-2 border border-gray-300 bg-white text-gold rounded focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
+        ></textarea>
         <button
           type="submit"
-          class="bg-gold text-black font-bold py-2 px-4 rounded self-end"
+          class="bg-gold text-black font-bold py-3 px-9 rounded-full"
         >
           Add Link
         </button>
       </form>
 
-      <div v-if="links.length" class="space-y-6">
+      <div v-if="links.length && createNew == false" class="space-y-6">
         <h2 class="text-2xl font-semibold mt-10">Existing Links</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <div
@@ -150,12 +188,30 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watch, onMounted, onBeforeUnmount, nextTick } from "vue";
+import VueDatePicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 const userStore = useUserStore();
 const loggedIn = computed(() => userStore.loggedIn);
 const error = ref("");
 const success = ref("");
 const email = ref("");
 const password = ref("");
+const createNew = ref(true);
+
+const tab1 = ref<HTMLElement | null>(null); //start as null, then assigned to DOM elements
+const tab2 = ref<HTMLElement | null>(null);
+
+const underlineLeft = ref(0);
+const underlineWidth = ref(0);
+
+function updateUnderline() {
+  const activeTab = createNew.value ? tab1.value : tab2.value;
+  if (activeTab) {
+    underlineLeft.value = activeTab.offsetLeft;
+    underlineWidth.value = activeTab.offsetWidth;
+  }
+}
 
 async function handleLogin() {
   error.value = "";
@@ -331,10 +387,25 @@ function resetForm() {
     date: "",
   };
 }
+onMounted(() => {
+  updateUnderline();
+  window.addEventListener("resize", updateUnderline);
+  links.value.forEach((link) => {
+    if (link.image) {
+      const img = new Image();
+      img.src = link.image;
+    }
+  });
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", updateUnderline);
+});
+watch(createNew, () => {
+  nextTick(() => {
+    updateUnderline();
+  });
+});
 </script>
 
-<style scoped>
-input {
-  color: gold;
-}
-</style>
+<style scoped></style>

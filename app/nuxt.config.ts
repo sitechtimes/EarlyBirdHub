@@ -43,7 +43,7 @@ export default defineNuxtConfig({
     ],
   },
   runtimeConfig: {
-    apiSecret: "",
+    apiSecret: "AIzaSyAVQKyYxMrhgHWR8f9LJms0GVpcufhMLwc",
   },
   pinia: {
     storesDirs: ["./stores/**"],

@@ -54,12 +54,6 @@
         >
           ❌ Rejected Items
         </button>
-        <button
-          @click="cleanupOldRejected"
-          class="px-4 py-2 rounded-lg font-semibold bg-red-600 text-white hover:bg-red-700 transition-colors"
-        >
-          🗑️ Cleanup Old
-        </button>
       </div>
 
       <!-- Messages -->
@@ -535,7 +529,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useDailyLinks } from "~/composables/useDailyLinks";
-import { useSanityUpload } from "~/composables/useSanityUpload";
 
 // Composables
 const {
@@ -550,11 +543,7 @@ const {
   submitDeleteRequest,
   approveAction,
   rejectAction,
-  unrejectAction,
-  cleanupOldRejected,
 } = useDailyLinks();
-
-const { uploadImage } = useSanityUpload();
 const authStore = useAuthStore();
 const loggedIn = computed(() => authStore.user !== null);
 
@@ -640,7 +629,7 @@ function cancelEdit() {
 
 async function handleLogin() {
   try {
-    await authStore.signIn({ email: email.value, password: password.value });
+    await authStore.signIn(email.value, password.value);
     clearMessages();
   } catch (err) {
     error.value = "Login failed. Please check your credentials.";
@@ -655,16 +644,12 @@ async function handleCreate() {
 
   isUploading.value = true;
   try {
-    const uploadResult = await uploadImage(selectedFile.value);
     await createLink({
       name: form.value.title,
       description: form.value.description,
       url: form.value.url,
-      date_end: form.value.date,
-      image: {
-        _type: "image",
-        asset: { _type: "reference", _ref: uploadResult._id },
-      },
+      date: form.value.date,
+      image: selectedFile.value, // Pass the File object directly
     });
     success.value = "Link submitted for approval";
     resetForm();
@@ -684,15 +669,11 @@ async function handleUpdateLink() {
       name: form.value.title,
       url: form.value.url,
       description: form.value.description,
-      date_end: form.value.date,
+      date: form.value.date,
     };
 
     if (selectedFile.value) {
-      const uploadResult = await uploadImage(selectedFile.value);
-      updateData.image = {
-        _type: "image",
-        asset: { _type: "reference", _ref: uploadResult._id },
-      };
+      updateData.image = selectedFile.value; // Pass the File object directly
     }
 
     await submitEditRequest(form.value.id, updateData);
@@ -774,16 +755,8 @@ async function handleUnreject(actionId: string) {
   clearMessages();
 
   try {
-    console.log("Unrejecting action:", actionId);
-    await unrejectAction(actionId);
-    success.value = "Action moved back to pending successfully";
-
-    // Refresh both pending and rejected actions
-    setTimeout(async () => {
-      await fetchPendingActions();
-      await fetchRejectedActions();
-      console.log("Actions refreshed after unreject");
-    }, 500);
+    console.log("Unreject functionality temporarily disabled");
+    success.value = "Unreject functionality temporarily disabled";
   } catch (err) {
     error.value = "Failed to unreject action";
     console.error("Unreject error:", err);

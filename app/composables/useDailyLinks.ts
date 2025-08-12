@@ -1,34 +1,54 @@
 import { ref, onMounted } from "vue";
 
 export function useDailyLinks() {
+  const { $supabase } = useNuxtApp();
   const staffLinks = ref<Array<any>>([]);
   const pendingActions = ref<Array<any>>([]);
   const rejectedActions = ref<Array<any>>([]);
 
-  // Fetch approved links for staff view
   const fetchStaffLinks = async () => {
     try {
-      staffLinks.value = await $fetch<any[]>("/api/daily-links?view=staff");
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .select("*")
+        .eq("approved", true)
+        .order("date", { ascending: false });
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      staffLinks.value = data || [];
     } catch (error) {
       console.error("Failed to fetch staff links:", error);
     }
   };
 
-  // Fetch pending actions for admin view
   const fetchPendingActions = async () => {
     try {
-      pendingActions.value = await $fetch<any[]>("/api/daily-links?view=admin");
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .select("*")
+        .eq("approved", false)
+        .order("date", { ascending: false });
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      pendingActions.value = data || [];
     } catch (error) {
       console.error("Failed to fetch pending actions:", error);
     }
   };
 
-  // Fetch rejected actions for admin view
+  // Fetch rejected actions - temporarily empty
   const fetchRejectedActions = async () => {
     try {
-      rejectedActions.value = await $fetch<any[]>(
-        "/api/daily-links?view=rejected"
-      );
+      // TODO: Implement when reject functionality is added back
+      rejectedActions.value = [];
     } catch (error) {
       console.error("Failed to fetch rejected actions:", error);
     }
@@ -36,99 +56,267 @@ export function useDailyLinks() {
 
   onMounted(fetchStaffLinks);
 
-  // Staff: Create new link (goes to pending)
+  // Helper function to upload image files to Supabase Storage
+  async function uploadImage(file: File): Promise<string> {
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `daily-links/${fileName}`;
+
+      const { data, error } = await $supabase.storage
+        .from("images") // Make sure you have an 'images' bucket in Supabase Storage
+        .upload(filePath, file);
+
+      if (error) {
+        console.error("Upload error:", error);
+        throw error;
+      }
+
+      // Get the public URL for the uploaded image
+      const {
+        data: { publicUrl },
+      } = $supabase.storage.from("images").getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error("Failed to upload image:", error);
+      throw error;
+    }
+  }
+
   async function createLink(payload: {
     name: string;
     description?: string;
-    url: string;
-    image: any;
-    date_end?: string;
-    date_uploaded?: string;
+    url?: string;
+    image?: File | string; // Can be either File object or URL string
+    date: string;
   }) {
-    if (!payload.image) throw new Error("Image is required");
+    try {
+      let imageUrl = payload.image;
 
-    const res = await $fetch("/api/daily-links", {
-      method: "POST",
-      body: {
-        ...payload,
-        action_type: "create",
-        status: "pending",
-        is_live: false,
-        date_uploaded: new Date().toISOString().split("T")[0],
-      },
-    });
-    return res;
+      // If image is a File object, upload it first
+      if (payload.image instanceof File) {
+        imageUrl = await uploadImage(payload.image);
+      }
+
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .insert([
+          {
+            name: payload.name,
+            description: payload.description,
+            url: payload.url,
+            img: imageUrl, // Now this will be a URL string
+            date: payload.date,
+            action_type: "create",
+            approved: false,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      return { success: true, data };
+    } catch (error) {
+      console.error("Failed to create link:", error);
+      throw error;
+    }
   }
 
-  // Staff: Submit edit request (creates pending edit)
+  // Staff: Submit edit request - temporarily simplified
   async function submitEditRequest(
     targetId: string,
     payload: {
       name: string;
       description?: string;
-      url: string;
-      image?: any;
-      date_end?: string;
+      url?: string;
+      image?: File | string; // Can be either File object or URL string
+      date: string;
     }
   ) {
-    const res = await $fetch("/api/daily-links/submit-edit", {
-      method: "POST",
-      body: {
-        ...payload,
-        target_document_id: targetId,
-      },
-    });
-    return res;
+    try {
+      let imageUrl = payload.image;
+
+      // If image is a File object, upload it first
+      if (payload.image instanceof File) {
+        imageUrl = await uploadImage(payload.image);
+      }
+
+      // TODO: Implement full edit workflow when needed
+      // For now, just create a new entry with old_id reference
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .insert([
+          {
+            name: payload.name,
+            description: payload.description,
+            url: payload.url,
+            img: imageUrl, // Now this will be a URL string
+            date: payload.date,
+            action_type: "edit",
+            old_id: targetId,
+            approved: false,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      return { success: true, data };
+    } catch (error) {
+      console.error("Failed to submit edit request:", error);
+      throw error;
+    }
   }
 
-  // Staff: Submit delete request (creates pending delete)
+  // Staff: Submit delete request - temporarily simplified
   async function submitDeleteRequest(targetId: string) {
-    const res = await $fetch("/api/daily-links/submit-delete", {
-      method: "POST",
-      body: {
-        target_document_id: targetId,
-      },
-    });
-    return res;
+    try {
+      // Get the original document first
+      const { data: original, error: fetchError } = await $supabase
+        .from("daily_links")
+        .select("*")
+        .eq("id", targetId)
+        .single();
+
+      if (fetchError) {
+        console.error("Supabase error:", fetchError);
+        throw fetchError;
+      }
+
+      // Create delete request with original data
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .insert([
+          {
+            name: original.name,
+            description: original.description,
+            url: original.url,
+            img: original.img,
+            date: original.date,
+            action_type: "delete",
+            old_id: targetId,
+            approved: false,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      return { success: true, data };
+    } catch (error) {
+      console.error("Failed to submit delete request:", error);
+      throw error;
+    }
   }
 
   // Admin: Approve pending action
   async function approveAction(actionId: string) {
-    const res = await $fetch(`/api/daily-links/${actionId}/approve`, {
-      method: "POST",
-    });
-    await fetchStaffLinks();
-    await fetchPendingActions();
-    return res;
+    try {
+      const { data: action, error: fetchError } = await $supabase
+        .from("daily_links")
+        .select("*")
+        .eq("id", actionId)
+        .single();
+
+      if (fetchError) {
+        console.error("Supabase error:", fetchError);
+        throw fetchError;
+      }
+
+      if (!action) {
+        throw new Error("Action not found");
+      }
+
+      if (action.action_type === "create") {
+        const { error: updateError } = await $supabase
+          .from("daily_links")
+          .update({ approved: true })
+          .eq("id", actionId);
+
+        if (updateError) throw updateError;
+      } else if (action.action_type === "edit" && action.old_id) {
+        const { error: updateError } = await $supabase
+          .from("daily_links")
+          .update({
+            name: action.name,
+            description: action.description,
+            url: action.url,
+            img: action.img,
+            date: action.date,
+          })
+          .eq("id", action.old_id);
+
+        if (updateError) throw updateError;
+
+        const { error: deleteError } = await $supabase
+          .from("daily_links")
+          .delete()
+          .eq("id", actionId);
+
+        if (deleteError) throw deleteError;
+      } else if (action.action_type === "delete" && action.old_id) {
+        const { error: deleteOriginalError } = await $supabase
+          .from("daily_links")
+          .delete()
+          .eq("id", action.old_id);
+
+        if (deleteOriginalError) throw deleteOriginalError;
+
+        const { error: deleteRequestError } = await $supabase
+          .from("daily_links")
+          .delete()
+          .eq("id", actionId);
+
+        if (deleteRequestError) throw deleteRequestError;
+      }
+
+      await fetchStaffLinks();
+      await fetchPendingActions();
+
+      return { success: true, message: "Action approved successfully" };
+    } catch (error) {
+      console.error("Failed to approve action:", error);
+      throw error;
+    }
   }
 
-  // Admin: Reject pending action
+  // Admin: Reject pending action - simply delete the request
   async function rejectAction(actionId: string) {
-    const res = await $fetch(`/api/daily-links/${actionId}/reject`, {
-      method: "POST",
-    });
-    await fetchPendingActions();
-    await fetchRejectedActions();
-    return res;
-  }
+    try {
+      const { error } = await $supabase
+        .from("daily_links")
+        .delete()
+        .eq("id", actionId);
 
-  // Admin: Unreject action (put back to pending)
-  async function unrejectAction(actionId: string) {
-    const res = await $fetch(`/api/daily-links/${actionId}/unreject`, {
-      method: "POST",
-    });
-    await fetchPendingActions();
-    await fetchRejectedActions();
-    return res;
-  }
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
 
-  // Admin: Cleanup old rejected items
-  async function cleanupOldRejected() {
-    const res = await $fetch("/api/daily-links/cleanup", {
-      method: "POST",
-    });
-    await fetchRejectedActions();
-    return res;
+      // Refresh the pending actions list
+      await fetchPendingActions();
+
+      return {
+        success: true,
+        message: "Action rejected and deleted successfully",
+      };
+    } catch (error) {
+      console.error("Failed to reject action:", error);
+      throw error;
+    }
   }
 
   return {
@@ -143,7 +331,5 @@ export function useDailyLinks() {
     submitDeleteRequest,
     approveAction,
     rejectAction,
-    unrejectAction,
-    cleanupOldRejected,
   };
 }

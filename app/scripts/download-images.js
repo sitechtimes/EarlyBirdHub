@@ -5,19 +5,32 @@ import path from "path";
 import { fileURLToPath } from "url";
 import https from "https";
 import http from "http";
+import { config } from "dotenv";
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Configuration - get from environment or use defaults
-const SUPABASE_URL =
-  process.env.NUXT_PUBLIC_SUPABASE_URL || "http://192.168.1.152:8000";
-const SUPABASE_ANON_KEY =
-  process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0";
+// Load environment variables from parent directory
+const envPath = path.join(__dirname, "..", ".env");
+config({ path: envPath });
+
+// Configuration - get from environment
+const SUPABASE_URL = process.env.NUXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY;
 const BUCKET_NAME = "daily-links-images";
 const OUTPUT_DIR = path.join(__dirname, "..", "public", "daily-links-images");
+
+// Validate required environment variables
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error("❌ Missing required environment variables:");
+  console.error("   NUXT_PUBLIC_SUPABASE_URL:", SUPABASE_URL ? "✅" : "❌");
+  console.error(
+    "   NUXT_PUBLIC_SUPABASE_ANON_KEY:",
+    SUPABASE_ANON_KEY ? "✅" : "❌"
+  );
+  process.exit(1);
+}
 
 console.log("🖼️  Starting image download script...");
 console.log(`📡 Supabase URL: ${SUPABASE_URL}`);

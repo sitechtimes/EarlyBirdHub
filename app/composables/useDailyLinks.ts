@@ -500,6 +500,25 @@ export function useDailyLinks() {
     }
   }
 
+  // Admin: Direct delete function (bypasses approval workflow)
+  async function deleteLinkDirect(linkId: string) {
+    try {
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .delete()
+        .eq("id", linkId)
+        .select();
+
+      if (error) throw error;
+
+      console.log("Link deleted directly:", data);
+      return { success: true, data };
+    } catch (error) {
+      console.error("Failed to delete link directly:", error);
+      throw error;
+    }
+  }
+
   async function updateSite() {
     try {
       await $fetch(`${config.public.backendUrl}build`, {
@@ -525,6 +544,7 @@ export function useDailyLinks() {
     rejectAction,
     updateLinkDirect,
     createLinkDirect,
+    deleteLinkDirect,
     updateSite,
   };
 }

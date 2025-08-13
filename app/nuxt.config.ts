@@ -61,7 +61,7 @@ export default defineNuxtConfig({
   },
   routeRules: {
     // Prevent Vue Router from handling image paths - serve as static assets
-    '/daily-links-images/**': { prerender: false }
+    "/daily-links-images/**": { prerender: false },
   },
   // Suppress Vue Router warnings for image paths
   vue: {

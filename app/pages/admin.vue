@@ -48,14 +48,6 @@
 
     <!-- Cards -->
     <div v-if="selected !== 'Create'" class="p-16">
-      <!-- Error and Success Messages -->
-      <div v-if="error" class="bg-red-600 text-white p-4 rounded-lg mb-4">
-        {{ error }}
-      </div>
-      <div v-if="success" class="bg-green-600 text-white p-4 rounded-lg mb-4">
-        {{ success }}
-      </div>
-
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <cardTemplate
           v-for="link in links"
@@ -107,7 +99,7 @@ const {
   fetchPendingActions,
   approveAction,
   rejectAction,
-  submitDeleteRequest,
+  deleteLinkDirect,
   updateLinkDirect,
   createLinkDirect,
   updateSite,
@@ -215,14 +207,14 @@ async function handleDelete(id: number | string) {
   success.value = "";
 
   try {
-    await submitDeleteRequest(String(id));
-    success.value = "Delete request submitted successfully";
+    await deleteLinkDirect(String(id));
+    success.value = "Link deleted successfully";
 
     setTimeout(async () => {
       await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
     }, 500);
   } catch (err) {
-    error.value = "Failed to submit delete request";
+    error.value = "Failed to delete link";
     console.error("Delete error:", err);
   } finally {
     isProcessing.value = false;

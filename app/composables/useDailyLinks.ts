@@ -8,6 +8,13 @@ export function useDailyLinks() {
 
   const fetchUserLinks = async () => {
     try {
+      // Check if Supabase client is available (important for static generation)
+      if (!$supabase) {
+        console.warn("Supabase client not available during static generation");
+        userLinks.value = [];
+        return;
+      }
+
       const { data, error } = await $supabase
         .from("daily_links")
         .select("*")
@@ -22,6 +29,7 @@ export function useDailyLinks() {
       console.log("User links fetched:", userLinks.value);
     } catch (error) {
       console.error("Failed to fetch user links:", error);
+      userLinks.value = [];
     }
   };
 

@@ -3,7 +3,6 @@
     <h1 class="text-4xl font-bold mb-6 border-b border-gold pb-2">
       Daily Links
     </h1>
-    <p>{{ groupedLinks }}</p>
 
     <section
       v-for="(group, index) in groupedLinks"
@@ -32,7 +31,7 @@
                 class="w-full rounded-lg h-32 sm:h-36 md:h-60 object-cover"
               />
               <div class="p-2 sm:p-3 md:p-4">
-                <h3 class="text-xl font-bold mb-1">{{ link.title }}</h3>
+                <h3 class="text-xl font-bold mb-1">{{ link.name }}</h3>
                 <p v-if="link.description" class="text-gold/80 text-sm">
                   {{ link.description }}
                 </p>
@@ -51,26 +50,30 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from "vue";
-
-const { userLinks, fetchUserLinks } = useDailyLinks();
-
-onMounted(fetchUserLinks);
+const response = await useFetch("/api/dailylinks", { server: true });
+const userLinks = response.data.value ?? []; // unwrap the ref by .value
 
 const todayString = new Date().toLocaleDateString();
 
 const groupedLinks = computed(() => {
+  if (!userLinks || userLinks.length === 0) {
+    return [
+      { title: "Today's Links", links: [] },
+      { title: "Earlier Links", links: [] },
+    ];
+  }
+
   return [
     {
-      title: "Today’s Links",
-      links: userLinks.value.filter(
-        (link) => new Date(link.date).toLocaleDateString() === todayString
+      title: "Today's Links",
+      links: userLinks.filter(
+        (link: any) => new Date(link.date).toLocaleDateString() === todayString
       ),
     },
     {
       title: "Earlier Links",
-      links: userLinks.value.filter(
-        (link) => new Date(link.date).toLocaleDateString() !== todayString
+      links: userLinks.filter(
+        (link: any) => new Date(link.date).toLocaleDateString() !== todayString
       ),
     },
   ];

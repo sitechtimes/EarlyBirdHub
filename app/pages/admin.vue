@@ -1,46 +1,95 @@
 <template>
-  <div class="flex-1 bg-black text-gold p-8 justify-center items-center">
-    <h1 class="text-4xl font-bold mb-6 border-b border-gold pb-2">
-      Daily Links
-    </h1>
+  <div class="w-full h-full">
+    <!-- Dropdown -->
+    <div class="w-full flex justify-center relative mt-5">
+      <button
+        @click="open = !open"
+        class="w-1/2 flex justify-between items-center bg-white border border-gray-200 rounded-xl px-4 py-2 text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+      >
+        {{ selected || "Pending" }}
+        <i
+          class="fa-solid fa-caret-up text-gold transition-transform"
+          :class="{ 'rotate-180': open }"
+        ></i>
+      </button>
+      <transition name="fade">
+        <div
+          v-if="open"
+          class="absolute top-full mt-2 w-1/2 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50"
+        >
+          <div
+            v-for="(option, index) in options"
+            :key="index"
+            @click="selectOption(option)"
+            :class="[
+              'px-4 py-2 cursor-pointer select-none font-medium',
+              option.disabled
+                ? 'text-gray-400 cursor-not-allowed'
+                : 'hover:bg-gray-100 text-gray-700 font-medium',
+            ]"
+          >
+            {{ option.label }}
+          </div>
+        </div>
+      </transition>
+    </div>
 
-    <section
-      v-for="(group, index) in groupedLinks"
-      :key="index"
-      class="mb-10 w-full border-2 border-black"
-    >
-      <h2 class="text-2xl font-semibold mb-4">{{ group.title }}</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-7">
-        <CardTemplate
-          v-if="group.links.length > 0"
-          v-for="link in group.links"
-          :page="'Approved'"
-          :admin="false"
+    <!-- Cards -->
+    <div class="p-16">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <cardTemplate
+          v-for="link in links"
+          :key="link.id"
           :link="link"
+          :page="page"
+          :admin="true"
         />
       </div>
-    </section>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import CardTemplate from "~/components/cardTemplate.vue";
-const links = [
+import { ref } from "vue";
+import cardTemplate from "~/components/cardTemplate.vue";
+
+type Status = "Pending" | "Approved" | "Denied";
+
+const page = ref<Status>("Pending");
+const open = ref(false);
+const selected = ref<string | null>(null);
+
+const options = [
+  { label: "Pending", disabled: false },
+  { label: "Approved", disabled: false },
+  { label: "Denied", disabled: false },
+];
+
+function selectOption(option: { label: string; disabled?: boolean }) {
+  if (!option.disabled) {
+    selected.value = option.label;
+    page.value = option.label as Status;
+    open.value = false;
+  }
+}
+
+const links = ref<DailyLink[]>([
   {
     id: 1,
     title: "School Spirit Day Flyer",
     url: "https://example.com/spiritday",
     image: "",
     description: "Wear your house colors this Friday!",
-    date: new Date("2025/08/06").toDateString(),
+    date: new Date("2025/08/05").toDateString(),
   },
   {
     id: 2,
     title: "Math Club Meeting",
     url: "https://example.com/mathclub",
-    image: "https://images.unsplash.com/photo-1513258496099-48168024aec0",
+    image:
+      "https://www.istockphoto.com/photo/cute-ginger-cat-gm1443562748-482502032",
     description: "Join us after school in Room 204.",
-    date: new Date("2025/08/06").toDateString(),
+    date: new Date("2025/08/04").toDateString(),
   },
   {
     id: 3,
@@ -64,7 +113,7 @@ const links = [
     url: "https://example.com/drama",
     image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
     description: "Auditions held in the auditorium after school.",
-    date: new Date("2025/08/06").toDateString(),
+    date: new Date("2025/08/02").toDateString(),
   },
   {
     id: 6,
@@ -122,17 +171,16 @@ const links = [
     description: "Help out at upcoming school events.",
     date: new Date("2025/08/05").toDateString(),
   },
-];
-const today = new Date();
-const groupedLinks = [
-  {
-    title: "Today’s Links",
-    links: links.filter((link) => link.date === today.toDateString()),
-  },
-
-  {
-    title: "Earlier Links",
-    links: links.filter((link) => link.date !== today.toDateString()),
-  },
-];
+]);
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

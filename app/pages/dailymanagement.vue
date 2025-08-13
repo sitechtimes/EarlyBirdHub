@@ -14,112 +14,24 @@
           ref="tab2"
           class="text-[150%] font-bold cursor-pointer pb-2 pt-3"
         >
-          Existing Links
+          Pending Links
         </h1>
-
-        <!-- Sliding underline -->
         <div
           class="absolute bottom-0 h-[2px] bg-gold rounded transition-all duration-300"
           :style="{ left: underlineLeft + 'px', width: underlineWidth + 'px' }"
         ></div>
       </div>
-
-      <form
-        v-if="createNew == true"
-        @submit.prevent="addLink"
-        class="flex flex-col items-center w-3/4 gap-4 bg-white p-5 rounded-3xl"
-      >
-        <h3 class="font-bold text-2xl">Link Form</h3>
-
-        <Input
-          class="w-[80%] border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
-          v-model="form.title"
-          inputType="text"
-          placeholder="Title"
-        />
-        <Input
-          v-model="form.url"
-          inputType="text"
-          placeholder="URL"
-          class="w-[80%] border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
-        />
-        <Input
-          v-model="form.image"
-          inputType="text"
-          placeholder="Image URL"
-          class="w-[80%] border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
-        />
-        <div class="w-[80%]">
-          <VueDatePicker v-model="form.date" text-input class="w-full" />
-        </div>
-        <textarea
-          v-model="form.description"
-          placeholder="Description"
-          class="w-[80%] p-2 border border-gray-300 bg-white text-gold rounded focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
-        ></textarea>
-        <button
-          type="submit"
-          class="bg-gold text-black font-bold py-3 px-9 rounded-full"
-        >
-          Add Link
-        </button>
-      </form>
-
+      <dailyform v-if="createNew == true" :form="form" @submit="addLink" />
       <div v-if="links.length && createNew == false" class="space-y-6">
-        <h2 class="text-2xl font-semibold mt-10">Existing Links</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <div
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 m-12">
+          <cardTemplate
             v-for="link in links"
-            :key="link.id"
-            class="border border-gold p-3 rounded-xl space-y-2 bg-zinc-950 hover:-translate-y-5 transform duration-300 transition-all"
-          >
-            <img
-              v-if="link.image"
-              :src="link.image"
-              alt=""
-              class="w-full h-28 object-cover rounded"
-            />
-            <h3 class="font-bold text-lg">{{ link.title }}</h3>
-            <p class="text-sm text-gold/80">{{ link.description }}</p>
-            <a
-              :href="link.url"
-              target="_blank"
-              class="text-sm text-blue-400 underline break-words"
-              >{{ link.url }}</a
-            >
-            <p class="text-xs italic text-gold/60">
-              Until: {{ new Date(link.date).toDateString() }}
-            </p>
-
-            <div class="flex justify-end gap-2 w-full">
-              <button
-                @click="editLink(link)"
-                class="text-black cursor-pointer py-2 w-full bg-gold rounded-full"
-              >
-                Edit
-              </button>
-              <button
-                @click="deleteLink(link.id)"
-                class="relative group cursor-pointer flex-col h-10 aspect-square bg-gold rounded-full gap-[1px] flex items-center justify-center"
-              >
-                <div
-                  class="flex flex-col items-center justify-center transition-all duration-200 group-hover:-translate-y-[2px]"
-                >
-                  <span
-                    class="w-3 h-1 bg-black rounded-sm transform"
-                    style="
-                      clip-path: polygon(20% 40%, 80% 40%, 100% 100%, 0% 100%);
-                    "
-                  ></span>
-                  <span class="w-5 h-1 bg-black rounded"></span>
-                </div>
-                <div
-                  class="w-4 h-[18px] bg-black rounded-b-[4px] transition-transform duration-300"
-                  style="clip-path: polygon(0% 0%, 100% 0%, 95% 100%, 5% 100%)"
-                ></div>
-              </button>
-            </div>
-          </div>
+            :page="'Pending'"
+            :admin="false"
+            :link="link"
+            @edit="editLink"
+            @delete="deleteLink"
+          />
         </div>
       </div>
     </div>
@@ -169,11 +81,11 @@
 
     <div
       v-if="editing"
-      class="fixed inset-0 bg-black/80 flex items-center justify-center"
+      class="fixed inset-0 bg-black/60 flex items-center justify-center"
     >
       <form
         @submit.prevent="updateLink"
-        class="bg-zinc-900 p-8 flex flex-col rounded-xl bg-white/10 backdrop-blur border border-gold w-[90%] max-w-lg space-y-4"
+        class="bg-zinc-900 p-8 flex flex-col rounded-xl bg-black/30 backdrop-blur border border-gold w-[90%] max-w-lg space-y-4"
       >
         <div
           class="border-b border-gold p-2 flex items-center w-full justify-between"
@@ -191,11 +103,12 @@
         <Input v-model="form.title" inputType="text" placeholder="Title" />
         <Input v-model="form.url" inputType="text" placeholder="URL" />
         <Input v-model="form.image" inputType="text" placeholder="Image URL" />
-        <Input
+        <textarea
           v-model="form.description"
-          inputType="text"
           placeholder="Description"
-        />
+          name="description"
+          id=""
+        ></textarea>
         <Input v-model="form.date" inputType="date" placeholder="Date" />
         <div class="flex self-end">
           <button
@@ -212,8 +125,9 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount, nextTick } from "vue";
-import VueDatePicker from "@vuepic/vue-datepicker";
-import "@vuepic/vue-datepicker/dist/main.css";
+import cardTemplate from "~/components/cardTemplate.vue";
+import type { Form } from "~/types/type";
+import dailyform from "~/components/dailyform.vue";
 const userStore = useUserStore();
 const loggedIn = computed(() => userStore.loggedIn);
 const error = ref("");
@@ -221,10 +135,8 @@ const success = ref("");
 const email = ref("");
 const password = ref("");
 const createNew = ref(true);
-
 const tab1 = ref<HTMLElement | null>(null); //start as null, then assigned to DOM elements
 const tab2 = ref<HTMLElement | null>(null);
-
 const underlineLeft = ref(0);
 const underlineWidth = ref(0);
 
@@ -239,13 +151,10 @@ function updateUnderline() {
 async function handleLogin() {
   error.value = "";
   success.value = "";
-
   try {
     const res = await fetch("http://100.101.65.108:8000/api/users/");
     const users = await res.json();
-
     const user = users.find((u: User) => u.email === email.value);
-
     if (user) {
       success.value = "Login successful!";
       //userStore.setUser(user);
@@ -371,10 +280,10 @@ const form = ref({
 
 const editing = ref(false);
 
-function addLink() {
-  if (!form.value.title || !form.value.url || !form.value.date) return;
+function addLink(submittedForm: Form) {
+  if (!submittedForm.title || !submittedForm.url || !submittedForm.date) return;
 
-  links.value.push({ ...form.value, id: nextId.value++ });
+  links.value.push({ ...submittedForm, id: nextId.value++ });
   resetForm();
 }
 

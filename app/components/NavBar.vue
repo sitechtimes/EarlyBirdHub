@@ -1,36 +1,31 @@
 <template>
   <nav
-    class="h-screen break-words w-36 text-white bg-black absolute top-0 left-0 flex flex-col shadow-lg navbar"
+    class="h-screen break-words w-fit text-white bg-black absolute top-0 left-0 flex flex-col shadow-lg navbar"
     :class="{ 'navbar-slide-out': isClosing }"
     v-if="isOpen"
   >
-    <ul class="list-none p-0 m-0 pt-14">
-      <li>
-        <NuxtLink
-          to="/"
-          class="block px-4 py-2 rounded hover:bg-gray-700 transition"
-          >Home</NuxtLink
-        >
+    <ul class="list-none p-3 m-0 pt-14 flex flex-col gap-2">
+      <li class="flex items-center hover:bg-gray-700 transition p-2 rounded-lg">
+        <i class="fa-solid fa-house"></i>
+        <NuxtLink to="/" class="px-2">Home</NuxtLink>
       </li>
-      <li class="border-t-2 border-gray-700">
-        <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700 transition"
-          >Submit Name Pronunciation</a
-        >
+      <li class="flex items-center hover:bg-gray-700 transition p-2 rounded-lg">
+        <i class="fa-solid fa-microphone"></i>
+        <a href="#" class="block px-2 rounded">Submit Name Pronunciation</a>
       </li>
-      <li class="border-t-2 border-gray-700">
+      <li class="flex items-center hover:bg-gray-700 transition p-2 rounded-lg">
+        <i class="fa-solid fa-crow"></i>
         <a
           href="https://www.youtube.com/playlist?list=PLXdwySAEBRBWocKBDaEE7HCw3rb3EvpeU"
           target="_blank"
           rel="noopener noreferrer"
-          class="block px-4 py-2 rounded hover:bg-gray-700 transition"
+          class="block px-2 rounded"
           >See past Early Birds</a
         >
       </li>
-      <li class="border-t-2 border-gray-700">
-        <a
-          href="_blank"
-          class="block px-4 py-2 rounded hover:bg-gray-700 transition"
-          rel="noopener noreferrer"
+      <li class="flex items-center hover:bg-gray-700 transition p-2 rounded-lg">
+        <i class="fa-solid fa-calendar"></i>
+        <a href="_blank" class="block px-2 rounded" rel="noopener noreferrer"
           >School Calander</a
         >
       </li>
@@ -53,11 +48,9 @@
         :class="isOpen ? '-rotate-45 -translate-y-1.5' : 'rotate-0'"
       ></span>
     </button>
-    <p class="text-white font-bold" v-if="windowWidth > 600">Menu</p>
   </div>
 </template>
 
 <script setup>
 const isOpen = ref(false);
-const { windowWidth } = useWindowSize();
 </script>

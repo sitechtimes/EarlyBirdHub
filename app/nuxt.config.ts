@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     "@nuxtjs/google-fonts",
     "@pinia/nuxt",
   ],
+  css: ["@fortawesome/fontawesome-free/css/all.min.css"],
   googleFonts: {
     families: {
       Inter: [400, 500, 600, 700],

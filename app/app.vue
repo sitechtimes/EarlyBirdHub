@@ -1,5 +1,5 @@
 <template>
-  <div class="p-3 h-full w-full flex flex-row">
+  <div class="h-full w-full flex flex-row">
     <NuxtPage />
     <NavBar />
   </div>

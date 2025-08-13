@@ -2,6 +2,7 @@ import {
   transformDailyLinksArray,
   shouldTransformUrls,
 } from "~/utils/imageTransform";
+import { getCurrentDate } from "~/utils/dateUtils";
 
 export function useDailyLinks() {
   const { $supabase } = useNuxtApp();
@@ -172,8 +173,7 @@ export function useDailyLinks() {
       }
 
       // Use provided date or current date
-      const currentDate =
-        payload.date || new Date().toISOString().split("T")[0];
+      const currentDate = payload.date || getCurrentDate();
 
       const { data, error } = await $supabase
         .from("daily_links")
@@ -229,8 +229,7 @@ export function useDailyLinks() {
       }
 
       // Use provided date or current date
-      const currentDate =
-        payload.date || new Date().toISOString().split("T")[0];
+      const currentDate = payload.date || getCurrentDate();
 
       // TODO: Implement full edit workflow when needed
       // For now, just create a new entry with old_id reference
@@ -474,7 +473,7 @@ export function useDailyLinks() {
       }
 
       // Use current date
-      const currentDate = new Date().toISOString().split("T")[0];
+      const currentDate = getCurrentDate();
 
       const { data, error } = await $supabase
         .from("daily_links")

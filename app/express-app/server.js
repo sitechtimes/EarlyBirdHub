@@ -28,7 +28,7 @@ app.use(express.json());
 app.get("/build", (req, res) => {
   const appPath = path.join(__dirname, "..");
   exec(
-    "npm run generate && netlify deploy --prod --dir=.output/public",
+    "npm run copy-local-images && npm run generate && npx netlify deploy --prod --dir=.output/public",
     { cwd: appPath },
     (err, stdout, stderr) => {
       if (err) {
@@ -45,7 +45,7 @@ app.get("/build", (req, res) => {
 app.post("/build", (req, res) => {
   const appPath = path.join(__dirname, "..");
   exec(
-    "npm run generate && netlify deploy --prod --dir=.output/public",
+    "npm run copy-local-images && npm run generate && netlify deploy --prod --dir=.output/public",
     { cwd: appPath },
     (err, stdout, stderr) => {
       if (err) {

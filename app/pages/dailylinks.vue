@@ -14,15 +14,22 @@
       :key="index"
       class="mb-10 w-full border-2 border-black"
     >
-      <h2 class="text-2xl font-semibold mb-4">{{ group.title }}</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-7">
-        <CardTemplate
-          v-if="group.links.length > 0"
-          v-for="link in group.links"
-          :page="'Approved'"
-          :admin="false"
-          :link="link"
-        />
+      <div
+        v-if="group.links.length > 0"
+        class="mb-10 w-full border-2 border-black"
+      >
+        <h2 class="text-2xl font-semibold mb-4">
+          {{ group.title }}
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-7">
+          <CardTemplate
+            v-if="group.links.length > 0"
+            v-for="link in group.links"
+            :page="'Approved'"
+            :admin="false"
+            :link="link"
+          />
+        </div>
       </div>
     </section>
   </div>

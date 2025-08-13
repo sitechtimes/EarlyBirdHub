@@ -1,0 +1,34 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm run prebuild && nuxt build",
+    "dev": "node --no-deprecation node_modules/nuxt/bin/nuxt.mjs dev --host",
+    "generate": "npm run prebuild && nuxt generate",
+    "prebuild": "node scripts/prebuild.js",
+    "download-images": "node scripts/download-images.js",
+    "copy-local-images": "node scripts/copy-local-images.js",
+    "setup-images": "node scripts/setup-images.js",
+    "scan-images": "node scripts/scan-needed-images.js",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.0.0",
+    "@nuxtjs/google-fonts": "^3.2.0",
+    "@pinia/nuxt": "^0.11.1",
+    "@sanity/client": "^7.8.2",
+    "@sanity/image-url": "^1.1.0",
+    "@supabase/supabase-js": "^2.54.0",
+    "dotenv": "^17.2.1",
+    "nuxt": "^3.17.6",
+    "pinia": "^3.0.3",
+    "vue": "^3.5.17",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "daisyui": "^5.0.46"
+  }
+}

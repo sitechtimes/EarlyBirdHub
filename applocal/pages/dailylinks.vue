@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-1 bg-black text-gold p-12 justify-center items-center">
+  <div class="flex-1 bg-black text-gold p-8 justify-center items-center">
     <h1 class="text-4xl font-bold mb-6 border-b border-gold pb-2">
       Daily Links
     </h1>

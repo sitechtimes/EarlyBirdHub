@@ -1,7 +1,7 @@
 <template>
   <form
     @submit.prevent="emit('submit', localForm)"
-    class="flex flex-col items-center w-3/4 gap-4 bg-white p-5 rounded-3xl"
+    class="flex flex-col items-center w-full md:w-3/4 gap-4 bg-white p-5 rounded-3xl"
   >
     <h3 class="font-bold text-2xl">Link Form</h3>
 

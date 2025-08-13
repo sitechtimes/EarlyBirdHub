@@ -85,6 +85,7 @@ interface Link {
   image?: string;
   description?: string;
   date: string;
+  approved: boolean;
 }
 
 const props = defineProps<{

@@ -5,4 +5,5 @@ export interface Form {
   image?: string;
   description?: string;
   date: string;
+  approved: boolean;
 }

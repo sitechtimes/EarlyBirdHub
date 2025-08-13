@@ -23,7 +23,9 @@
       </div>
       <dailyform v-if="createNew == true" :form="form" @submit="addLink" />
       <div v-if="links.length && createNew == false" class="space-y-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 m-12">
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-10 md:m-12"
+        >
           <cardTemplate
             v-for="link in links"
             :page="'Pending'"

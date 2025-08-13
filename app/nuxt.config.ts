@@ -34,15 +34,6 @@ export default defineNuxtConfig({
       meta: [{ name: "format-detection", content: "telephone=no" }],
     },
   },
-  nitro: {
-    publicAssets: [
-      {
-        baseURL: "/.well-known",
-        dir: "public/.well-known",
-        maxAge: 60 * 60 * 24 * 365, // 1 year
-      },
-    ],
-  },
   runtimeConfig: {
     apiSecret: "",
     public: {
@@ -53,5 +44,20 @@ export default defineNuxtConfig({
   },
   pinia: {
     storesDirs: ["./stores/**"],
+  },
+  nitro: {
+    publicAssets: [
+      {
+        baseURL: "/.well-known",
+        dir: "public/.well-known",
+        maxAge: 60 * 60 * 24 * 365, // 1 year
+      },
+    ],
+  },
+  // Suppress Vue Router warnings for image paths
+  vue: {
+    compilerOptions: {
+      isCustomElement: () => false,
+    },
   },
 });

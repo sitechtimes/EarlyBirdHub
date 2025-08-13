@@ -1,3 +1,8 @@
+import {
+  transformDailyLinksArray,
+  shouldTransformUrls,
+} from "~/utils/imageTransform";
+
 export function useDailyLinks() {
   const { $supabase } = useNuxtApp();
   const config = useRuntimeConfig();
@@ -24,7 +29,12 @@ export function useDailyLinks() {
         throw error;
       }
 
-      userLinks.value = data || [];
+      const forceTransform = shouldTransformUrls();
+      userLinks.value = transformDailyLinksArray(
+        data || [],
+        config.public.supabaseUrl,
+        forceTransform
+      );
       console.log("User links fetched:", userLinks.value);
     } catch (error) {
       console.error("Failed to fetch user links:", error);
@@ -45,7 +55,12 @@ export function useDailyLinks() {
         throw error;
       }
 
-      staffLinks.value = data || [];
+      const forceTransform = shouldTransformUrls();
+      staffLinks.value = transformDailyLinksArray(
+        data || [],
+        config.public.supabaseUrl,
+        forceTransform
+      );
     } catch (error) {
       console.error("Failed to fetch staff links:", error);
     }
@@ -64,7 +79,12 @@ export function useDailyLinks() {
         throw error;
       }
 
-      pendingActions.value = data || [];
+      const forceTransform = shouldTransformUrls();
+      pendingActions.value = transformDailyLinksArray(
+        data || [],
+        config.public.supabaseUrl,
+        forceTransform
+      );
     } catch (error) {
       console.error("Failed to fetch pending actions:", error);
     }

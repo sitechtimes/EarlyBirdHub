@@ -4,9 +4,7 @@
       Daily Links
     </h1>
 
-    <div v-if="pending" class="text-center text-xl">Loading daily links...</div>
-
-    <div v-else-if="error" class="text-center text-red-500">
+    <div v-if="error" class="text-center text-red-500">
       Error loading links: {{ error }}
     </div>
 
@@ -33,14 +31,10 @@
 <script setup lang="ts">
 import CardTemplate from "~/components/cardTemplate.vue";
 
-const config = useRuntimeConfig();
-const pending = ref(true);
 const error = ref<any>(null);
 
 const response = await useFetch("/api/dailylinks", { server: true });
 const userLinks = response.data.value ?? []; // unwrap the ref by .value
-
-const todayString = new Date().toLocaleDateString();
 
 const groupedLinks = computed(() => {
   const links = userLinks || [];

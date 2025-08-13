@@ -44,12 +44,10 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     apiSecret: "",
-    sanityProjectId: "",
-    sanityDataset: "",
-    sanityWriteToken: "",
     public: {
       supabaseUrl: "",
       supabaseAnonKey: "",
+      backendUrl: "",
     },
   },
   pinia: {

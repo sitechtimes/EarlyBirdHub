@@ -1,10 +1,29 @@
-import { ref, onMounted } from "vue";
-
 export function useDailyLinks() {
   const { $supabase } = useNuxtApp();
+  const config = useRuntimeConfig();
   const staffLinks = ref<Array<any>>([]);
   const pendingActions = ref<Array<any>>([]);
   const rejectedActions = ref<Array<any>>([]);
+  const userLinks = ref<Array<any>>([]);
+
+  const fetchUserLinks = async () => {
+    try {
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .select("*")
+        .eq("approved", true);
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      userLinks.value = data || [];
+      console.log("User links fetched:", userLinks.value);
+    } catch (error) {
+      console.error("Failed to fetch user links:", error);
+    }
+  };
 
   const fetchStaffLinks = async () => {
     try {
@@ -53,8 +72,6 @@ export function useDailyLinks() {
       console.error("Failed to fetch rejected actions:", error);
     }
   };
-
-  onMounted(fetchStaffLinks);
 
   // Helper function to upload image files to Supabase Storage
   async function uploadImage(file: File): Promise<string> {
@@ -106,7 +123,7 @@ export function useDailyLinks() {
             name: payload.name,
             description: payload.description,
             url: payload.url,
-            img: imageUrl, // Now this will be a URL string
+            img: imageUrl,
             date: payload.date,
             action_type: "create",
             approved: false,
@@ -285,7 +302,15 @@ export function useDailyLinks() {
 
       await fetchStaffLinks();
       await fetchPendingActions();
-
+      try {
+        await $fetch(`${config.public.backendUrl}/deploy`, {
+          method: "POST",
+          body: { actionId },
+        });
+      } catch (error) {
+        console.error("Failed to notify backend:", error);
+        throw error;
+      }
       return { success: true, message: "Action approved successfully" };
     } catch (error) {
       console.error("Failed to approve action:", error);
@@ -293,7 +318,7 @@ export function useDailyLinks() {
     }
   }
 
-  // Admin: Reject pending action - simply delete the request
+  // Admin: Reject pending action
   async function rejectAction(actionId: string) {
     try {
       const { error } = await $supabase
@@ -306,7 +331,6 @@ export function useDailyLinks() {
         throw error;
       }
 
-      // Refresh the pending actions list
       await fetchPendingActions();
 
       return {
@@ -321,6 +345,7 @@ export function useDailyLinks() {
 
   return {
     staffLinks,
+    userLinks,
     pendingActions,
     rejectedActions,
     fetchStaffLinks,
@@ -329,6 +354,7 @@ export function useDailyLinks() {
     createLink,
     submitEditRequest,
     submitDeleteRequest,
+    fetchUserLinks,
     approveAction,
     rejectAction,
   };

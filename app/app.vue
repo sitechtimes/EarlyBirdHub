@@ -5,7 +5,4 @@
   </div>
 </template>
 
-<script setup lang="ts">
-const authStore = useAuthStore();
-console.log(authStore.user);
-</script>
+<script setup lang="ts"></script>

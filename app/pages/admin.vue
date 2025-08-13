@@ -49,17 +49,17 @@
     <!-- Cards -->
     <div v-if="selected !== 'Create'" class="p-16">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        <cardTemplate
-          v-for="link in links"
-          :key="link.id"
-          :link="link"
-          :page="page"
-          :admin="true"
-          @approve="handleApprove"
-          @reject="handleReject"
-          @edit="editLink"
-          @delete="handleDelete"
-        />
+        <div v-for="link in links" :key="link.id" class="min-w-[300px]">
+          <cardTemplate
+            :link="link"
+            :page="page"
+            :admin="true"
+            @approve="handleApprove"
+            @reject="handleReject"
+            @edit="editLink"
+            @delete="handleDelete"
+          />
+        </div>
       </div>
     </div>
 

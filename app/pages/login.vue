@@ -29,7 +29,7 @@
     <div class="w-1/2 hidden md:inline rounded-3xl m-6 overflow-auto">
       <img
         class="w-full h-full object-cover"
-        src="https://sdmntprsouthcentralus.oaiusercontent.com/files/00000000-8b08-61f7-ab95-bf44ecfe14c7/raw?se=2025-08-13T01%3A04%3A04Z&sp=r&sv=2024-08-04&sr=b&scid=14f549a1-5739-5f19-aeb9-a6762107b4b6&skoid=f28c0102-4d9d-4950-baf0-4a8e5f6cf9d4&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-08-12T22%3A33%3A57Z&ske=2025-08-13T22%3A33%3A57Z&sks=b&skv=2024-08-04&sig=DvvGHT5rscKXft%2B6ivxweuBM0FaOsGuai71D6w9nYoM%3D"
+        src="https://media.discordapp.net/attachments/1392863675022577816/1405027799437148251/raw.png?ex=689d559b&is=689c041b&hm=a4e6d189db596ca0d31ed613b3445d206e694073c44d24b3503bc913a0a3b304&=&format=webp&quality=lossless&width=1676&height=1118"
         alt=""
       />
     </div>

@@ -38,14 +38,22 @@
           Decline
         </button>
         <button
-          v-if="props.page === 'Pending' && props.admin === false"
+          v-if="
+            (props.page === 'Pending' && props.admin === false) ||
+            props.page === 'Approved' ||
+            props.page === 'Update'
+          "
           @click="emit('edit', props.link)"
           class="text-black font-medium cursor-pointer py-2 w-full bg-gold rounded-full"
         >
           Edit
         </button>
         <button
-          v-if="props.page === 'Pending' && props.admin === false"
+          v-if="
+            (props.page === 'Pending' && props.admin === false) ||
+            props.page === 'Approved' ||
+            props.page === 'Update'
+          "
           @click="emit('delete', props.link.id)"
           class="relative group cursor-pointer flex-col h-10 aspect-square bg-gold rounded-full gap-[1px] flex items-center justify-center"
         >
@@ -63,15 +71,6 @@
             style="clip-path: polygon(0% 0%, 100% 0%, 95% 100%, 5% 100%)"
           ></div>
         </button>
-        <button
-          v-if="
-            (props.page === 'Approved' || props.page === 'Denied') &&
-            props.admin === true
-          "
-          class="mt-4 w-full bg-gold text-black font-semibold py-2 rounded-full hover:bg-white duration-200 transition"
-        >
-          {{ props.page === "Approved" ? "Remove" : "Recover" }}
-        </button>
       </div>
     </div>
   </div>
@@ -85,12 +84,12 @@ interface Link {
   image?: string;
   description?: string;
   date: string;
-  approved: boolean;
+  approved?: boolean;
 }
 
 const props = defineProps<{
   link: Link;
-  page: "Pending" | "Approved" | "Denied";
+  page: "Pending" | "Approved" | "Update";
   admin: boolean;
 }>();
 

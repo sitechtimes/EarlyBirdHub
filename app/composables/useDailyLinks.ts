@@ -71,17 +71,25 @@ export function useDailyLinks() {
     }
   };
 
-  // Fetch rejected actions - temporarily empty
   const fetchRejectedActions = async () => {
     try {
-      // TODO: Implement when reject functionality is added back
-      rejectedActions.value = [];
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .select("*")
+        .eq("status", "rejected")
+        .order("date", { ascending: false });
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      rejectedActions.value = data || [];
     } catch (error) {
       console.error("Failed to fetch rejected actions:", error);
     }
   };
 
-  // Helper function to upload image files to Supabase Storage
   async function uploadImage(file: File): Promise<string> {
     try {
       const fileExt = file.name.split(".").pop();
@@ -89,18 +97,20 @@ export function useDailyLinks() {
       const filePath = `daily-links/${fileName}`;
 
       const { data, error } = await $supabase.storage
-        .from("images") // Make sure you have an 'images' bucket in Supabase Storage
-        .upload(filePath, file);
+        .from("daily-links-images")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
 
       if (error) {
         console.error("Upload error:", error);
         throw error;
       }
 
-      // Get the public URL for the uploaded image
       const {
         data: { publicUrl },
-      } = $supabase.storage.from("images").getPublicUrl(filePath);
+      } = $supabase.storage.from("daily-links-images").getPublicUrl(filePath);
 
       return publicUrl;
     } catch (error) {

@@ -10,8 +10,8 @@ export default {
       "2xl": "1536px",
     },
     colors: {
-      primary: "#1E40AF",
-      secondary: "#FBBF24",
+      primary: "#d7ad4e",
+      secondary: "#000000",
       accent: "#F472B6",
       neutral: "#374151",
       "base-100": "#FFFFFF",

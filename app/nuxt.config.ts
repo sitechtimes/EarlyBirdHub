@@ -44,6 +44,11 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     apiSecret: "",
+    public: {
+      supabaseUrl: "",
+      supabaseAnonKey: "",
+      backendUrl: "",
+    },
   },
   pinia: {
     storesDirs: ["./stores/**"],

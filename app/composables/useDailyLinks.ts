@@ -1,0 +1,379 @@
+export function useDailyLinks() {
+  const { $supabase } = useNuxtApp();
+  const config = useRuntimeConfig();
+  const staffLinks = ref<Array<any>>([]);
+  const pendingActions = ref<Array<any>>([]);
+  const rejectedActions = ref<Array<any>>([]);
+  const userLinks = ref<Array<any>>([]);
+
+  const fetchUserLinks = async () => {
+    try {
+      // Check if Supabase client is available (important for static generation)
+      if (!$supabase) {
+        console.warn("Supabase client not available during static generation");
+        userLinks.value = [];
+        return;
+      }
+
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .select("*")
+        .eq("approved", true);
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      userLinks.value = data || [];
+      console.log("User links fetched:", userLinks.value);
+    } catch (error) {
+      console.error("Failed to fetch user links:", error);
+      userLinks.value = [];
+    }
+  };
+
+  const fetchStaffLinks = async () => {
+    try {
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .select("*")
+        .eq("approved", true)
+        .order("date", { ascending: false });
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      staffLinks.value = data || [];
+    } catch (error) {
+      console.error("Failed to fetch staff links:", error);
+    }
+  };
+
+  const fetchPendingActions = async () => {
+    try {
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .select("*")
+        .eq("approved", false)
+        .order("date", { ascending: false });
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      pendingActions.value = data || [];
+    } catch (error) {
+      console.error("Failed to fetch pending actions:", error);
+    }
+  };
+
+  const fetchRejectedActions = async () => {
+    try {
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .select("*")
+        .eq("status", "rejected")
+        .order("date", { ascending: false });
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      rejectedActions.value = data || [];
+    } catch (error) {
+      console.error("Failed to fetch rejected actions:", error);
+    }
+  };
+
+  async function uploadImage(file: File): Promise<string> {
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `daily-links/${fileName}`;
+
+      const { data, error } = await $supabase.storage
+        .from("daily-links-images")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (error) {
+        console.error("Upload error:", error);
+        throw error;
+      }
+
+      const {
+        data: { publicUrl },
+      } = $supabase.storage.from("daily-links-images").getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error("Failed to upload image:", error);
+      throw error;
+    }
+  }
+
+  async function createLink(payload: {
+    name: string;
+    description?: string;
+    url?: string;
+    image?: File | string; // Can be either File object or URL string
+    date: string;
+  }) {
+    try {
+      let imageUrl = payload.image;
+
+      // If image is a File object, upload it first
+      if (payload.image instanceof File) {
+        imageUrl = await uploadImage(payload.image);
+      }
+
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .insert([
+          {
+            name: payload.name,
+            description: payload.description,
+            url: payload.url,
+            img: imageUrl,
+            date: payload.date,
+            action_type: "create",
+            approved: false,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      return { success: true, data };
+    } catch (error) {
+      console.error("Failed to create link:", error);
+      throw error;
+    }
+  }
+
+  // Staff: Submit edit request - temporarily simplified
+  async function submitEditRequest(
+    targetId: string,
+    payload: {
+      name: string;
+      description?: string;
+      url?: string;
+      image?: File | string; // Can be either File object or URL string
+      date: string;
+    }
+  ) {
+    try {
+      let imageUrl = payload.image;
+
+      // If image is a File object, upload it first
+      if (payload.image instanceof File) {
+        imageUrl = await uploadImage(payload.image);
+      }
+
+      // TODO: Implement full edit workflow when needed
+      // For now, just create a new entry with old_id reference
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .insert([
+          {
+            name: payload.name,
+            description: payload.description,
+            url: payload.url,
+            img: imageUrl, // Now this will be a URL string
+            date: payload.date,
+            action_type: "edit",
+            old_id: targetId,
+            approved: false,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      return { success: true, data };
+    } catch (error) {
+      console.error("Failed to submit edit request:", error);
+      throw error;
+    }
+  }
+
+  // Staff: Submit delete request - temporarily simplified
+  async function submitDeleteRequest(targetId: string) {
+    try {
+      // Get the original document first
+      const { data: original, error: fetchError } = await $supabase
+        .from("daily_links")
+        .select("*")
+        .eq("id", targetId)
+        .single();
+
+      if (fetchError) {
+        console.error("Supabase error:", fetchError);
+        throw fetchError;
+      }
+
+      // Create delete request with original data
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .insert([
+          {
+            name: original.name,
+            description: original.description,
+            url: original.url,
+            img: original.img,
+            date: original.date,
+            action_type: "delete",
+            old_id: targetId,
+            approved: false,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      return { success: true, data };
+    } catch (error) {
+      console.error("Failed to submit delete request:", error);
+      throw error;
+    }
+  }
+
+  // Admin: Approve pending action
+  async function approveAction(actionId: string) {
+    try {
+      const { data: action, error: fetchError } = await $supabase
+        .from("daily_links")
+        .select("*")
+        .eq("id", actionId)
+        .single();
+
+      if (fetchError) {
+        console.error("Supabase error:", fetchError);
+        throw fetchError;
+      }
+
+      if (!action) {
+        throw new Error("Action not found");
+      }
+
+      if (action.action_type === "create") {
+        const { error: updateError } = await $supabase
+          .from("daily_links")
+          .update({ approved: true })
+          .eq("id", actionId);
+
+        if (updateError) throw updateError;
+      } else if (action.action_type === "edit" && action.old_id) {
+        const { error: updateError } = await $supabase
+          .from("daily_links")
+          .update({
+            name: action.name,
+            description: action.description,
+            url: action.url,
+            img: action.img,
+            date: action.date,
+          })
+          .eq("id", action.old_id);
+
+        if (updateError) throw updateError;
+
+        const { error: deleteError } = await $supabase
+          .from("daily_links")
+          .delete()
+          .eq("id", actionId);
+
+        if (deleteError) throw deleteError;
+      } else if (action.action_type === "delete" && action.old_id) {
+        const { error: deleteOriginalError } = await $supabase
+          .from("daily_links")
+          .delete()
+          .eq("id", action.old_id);
+
+        if (deleteOriginalError) throw deleteOriginalError;
+
+        const { error: deleteRequestError } = await $supabase
+          .from("daily_links")
+          .delete()
+          .eq("id", actionId);
+
+        if (deleteRequestError) throw deleteRequestError;
+      }
+
+      await fetchStaffLinks();
+      await fetchPendingActions();
+      try {
+        await $fetch(`${config.public.backendUrl}/deploy`, {
+          method: "POST",
+          body: { actionId },
+        });
+      } catch (error) {
+        console.error("Failed to notify backend:", error);
+        throw error;
+      }
+      return { success: true, message: "Action approved successfully" };
+    } catch (error) {
+      console.error("Failed to approve action:", error);
+      throw error;
+    }
+  }
+
+  // Admin: Reject pending action
+  async function rejectAction(actionId: string) {
+    try {
+      const { error } = await $supabase
+        .from("daily_links")
+        .delete()
+        .eq("id", actionId);
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      await fetchPendingActions();
+
+      return {
+        success: true,
+        message: "Action rejected and deleted successfully",
+      };
+    } catch (error) {
+      console.error("Failed to reject action:", error);
+      throw error;
+    }
+  }
+
+  return {
+    staffLinks,
+    userLinks,
+    pendingActions,
+    rejectedActions,
+    fetchStaffLinks,
+    fetchPendingActions,
+    fetchRejectedActions,
+    createLink,
+    submitEditRequest,
+    submitDeleteRequest,
+    fetchUserLinks,
+    approveAction,
+    rejectAction,
+  };
+}

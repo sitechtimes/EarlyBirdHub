@@ -15,7 +15,6 @@ export const useAuthStore = defineStore("auth", () => {
     return null;
   });
 
-  // Permission computed properties
   const isAdmin = computed(() => userRole.value === "admin");
   const isStaff = computed(() => userRole.value === "staff");
   const hasFullAccess = computed(() => userRole.value === "admin");

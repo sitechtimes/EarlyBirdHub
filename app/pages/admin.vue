@@ -34,14 +34,28 @@
       </transition>
     </div>
     <button
-      @click=""
+      @click="updateStatic"
       v-if="selected === 'Update'"
       class="p-2 bg-white rounded-lg text-gold w-1/2 mt-5"
     >
       Update Website
     </button>
+
+    <!-- Create Form -->
+    <div v-if="selected === 'Create'" class="w-full max-w-2xl mt-8">
+      <dailyform :form="createForm" @submit="handleCreateLink" />
+    </div>
+
     <!-- Cards -->
-    <div class="p-16">
+    <div v-if="selected !== 'Create'" class="p-16">
+      <!-- Error and Success Messages -->
+      <div v-if="error" class="bg-red-600 text-white p-4 rounded-lg mb-4">
+        {{ error }}
+      </div>
+      <div v-if="success" class="bg-green-600 text-white p-4 rounded-lg mb-4">
+        {{ success }}
+      </div>
+
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <cardTemplate
           v-for="link in links"
@@ -49,9 +63,22 @@
           :link="link"
           :page="page"
           :admin="true"
+          @approve="handleApprove"
+          @reject="handleReject"
           @edit="editLink"
-          @delete="deleteLink"
+          @delete="handleDelete"
         />
+      </div>
+    </div>
+
+    <!-- Create Form Messages -->
+    <div v-if="selected === 'Create'" class="w-full max-w-2xl px-4">
+      <!-- Error and Success Messages for Create Form -->
+      <div v-if="error" class="bg-red-600 text-white p-4 rounded-lg mb-4">
+        {{ error }}
+      </div>
+      <div v-if="success" class="bg-green-600 text-white p-4 rounded-lg mb-4">
+        {{ success }}
       </div>
     </div>
     <div
@@ -66,127 +93,206 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import cardTemplate from "~/components/cardTemplate.vue";
+import dailyform from "~/components/dailyform.vue";
+import { useDailyLinks } from "~/composables/useDailyLinks";
 
-type Status = "Pending" | "Approved" | "Update";
+definePageMeta({
+  middleware: ["auth", "admin"],
+});
+
+const {
+  staffLinks,
+  pendingActions,
+  fetchStaffLinks,
+  fetchPendingActions,
+  approveAction,
+  rejectAction,
+  submitDeleteRequest,
+  updateLinkDirect,
+  createLinkDirect,
+  updateSite,
+} = useDailyLinks();
+
+const authStore = useAuthStore();
+
+type Status = "Pending" | "Approved" | "Create" | "Update";
 const form = ref({
+  id: null as string | null,
+  name: "",
+  url: "",
+  img: "",
+  description: "",
+  date: "",
+});
+
+const createForm = ref({
   id: null,
   title: "",
   url: "",
-  image: "",
   description: "",
-  date: "",
 });
 
 const editing = ref(false);
 const page = ref<Status>("Pending");
 const open = ref(false);
-const selected = ref<string | null>(null);
+const selected = ref<string | null>("Pending");
+const error = ref("");
+const success = ref("");
+const isProcessing = ref(false);
 
 const options = [
   { label: "Pending", disabled: false },
   { label: "Approved", disabled: false },
+  { label: "Create", disabled: false },
   { label: "Update", disabled: false },
 ];
 
-const links = ref<DailyLink[]>([
-  {
-    id: 1,
-    title: "School Spirit Day Flyer",
-    url: "https://example.com/spiritday",
-    image: "",
-    description: "Wear your house colors this Friday!",
-    date: new Date("2025/08/05").toDateString(),
-  },
-  {
-    id: 2,
-    title: "Math Club Meeting",
-    url: "https://example.com/mathclub",
-    image:
-      "https://www.istockphoto.com/photo/cute-ginger-cat-gm1443562748-482502032",
-    description: "Join us after school in Room 204.",
-    date: new Date("2025/08/04").toDateString(),
-  },
-  {
-    id: 3,
-    title: "SAT Registration Deadline",
-    url: "https://example.com/sat",
-    image:
-      "https://media.istockphoto.com/id/1443562748/photo/cute-ginger-cat.jpg?s=612x612&w=0&k=20&c=vvM97wWz-hMj7DLzfpYRmY2VswTqcFEKkC437hxm3Cg=",
-    date: new Date("2025/07/28").toDateString(),
-  },
-  {
-    id: 4,
-    title: "Science Fair Registration",
-    url: "https://example.com/sciencefair",
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-    description: "Sign up by August 1st to participate.",
-    date: new Date("2025/08/01").toDateString(),
-  },
-  {
-    id: 5,
-    title: "Drama Club Auditions",
-    url: "https://example.com/drama",
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-    description: "Auditions held in the auditorium after school.",
-    date: new Date("2025/08/02").toDateString(),
-  },
-  {
-    id: 6,
-    title: "Chess Tournament",
-    url: "https://example.com/chess",
-    image: "",
-    description: "Register your team by August 3rd.",
-    date: new Date("2025/08/03").toDateString(),
-  },
-  {
-    id: 7,
-    title: "Art Exhibition",
-    url: "https://example.com/art",
-    image: "https://images.unsplash.com/photo-1464983953574-0892a716854b",
-    description: "Visit the art room to see student work.",
-    date: new Date("2025/08/04").toDateString(),
-  },
-  {
-    id: 8,
-    title: "Football Tryouts",
-    url: "https://example.com/football",
-    image: "",
-    description: "Tryouts start at 3:30pm on the field.",
-    date: new Date("2025/08/05").toDateString(),
-  },
-  {
-    id: 9,
-    title: "Library Book Return",
-    url: "https://example.com/library",
-    image: "",
-    description: "Return overdue books by August 2nd.",
-    date: new Date("2025/08/02").toDateString(),
-  },
-  {
-    id: 10,
-    title: "Parent-Teacher Conferences",
-    url: "https://example.com/conferences",
-    image: "https://images.unsplash.com/photo-1513258496099-48168024aec0",
-    description: "Schedule your meeting online.",
-    date: new Date("2025/08/03").toDateString(),
-  },
-  {
-    id: 11,
-    title: "Yearbook Orders",
-    url: "https://example.com/yearbook",
-    image: "",
-    description: "Order your yearbook before August 4th.",
-    date: new Date("2025/08/04").toDateString(),
-  },
-  {
-    id: 12,
-    title: "Volunteer Sign-Up",
-    url: "https://example.com/volunteer",
-    image: "",
-    description: "Help out at upcoming school events.",
-    date: new Date("2025/08/05").toDateString(),
-  },
-]);
+const links = computed(() => {
+  switch (page.value) {
+    case "Pending":
+      return pendingActions.value;
+    case "Approved":
+      return staffLinks.value;
+    default:
+      return [];
+  }
+});
+
+async function handleApprove(actionId: number) {
+  if (isProcessing.value) return;
+
+  isProcessing.value = true;
+  error.value = "";
+  success.value = "";
+
+  try {
+    await approveAction(String(actionId));
+    success.value = "Action approved successfully";
+
+    setTimeout(async () => {
+      await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
+    }, 500);
+  } catch (err) {
+    error.value = "Failed to approve action";
+    console.error("Approve error:", err);
+  } finally {
+    isProcessing.value = false;
+  }
+}
+
+async function handleReject(actionId: number) {
+  if (isProcessing.value) return;
+
+  isProcessing.value = true;
+  error.value = "";
+  success.value = "";
+
+  try {
+    await rejectAction(String(actionId));
+    success.value = "Action rejected successfully";
+
+    setTimeout(async () => {
+      await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
+    }, 500);
+  } catch (err) {
+    error.value = "Failed to reject action";
+    console.error("Reject error:", err);
+  } finally {
+    isProcessing.value = false;
+  }
+}
+
+function editLink(link: any) {
+  form.value = { ...link };
+  editing.value = true;
+}
+
+async function handleDelete(id: number | string) {
+  if (isProcessing.value) return;
+
+  isProcessing.value = true;
+  error.value = "";
+  success.value = "";
+
+  try {
+    await submitDeleteRequest(String(id));
+    success.value = "Delete request submitted successfully";
+
+    setTimeout(async () => {
+      await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
+    }, 500);
+  } catch (err) {
+    error.value = "Failed to submit delete request";
+    console.error("Delete error:", err);
+  } finally {
+    isProcessing.value = false;
+  }
+}
+
+async function updateLink(formData: any) {
+  if (isProcessing.value || !formData.id) return;
+
+  isProcessing.value = true;
+  error.value = "";
+  success.value = "";
+
+  try {
+    await updateLinkDirect(String(formData.id), {
+      name: formData.name,
+      description: formData.description,
+      url: formData.url,
+      image: formData.imageFile || formData.img || "",
+    });
+    success.value = "Link updated successfully";
+    cancelEdit();
+
+    setTimeout(async () => {
+      await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
+    }, 500);
+  } catch (err) {
+    error.value = "Failed to update link";
+    console.error("Update error:", err);
+  } finally {
+    isProcessing.value = false;
+  }
+}
+
+async function handleCreateLink(formData: any) {
+  if (isProcessing.value) return;
+
+  isProcessing.value = true;
+  error.value = "";
+  success.value = "";
+
+  try {
+    await createLinkDirect({
+      name: formData.title,
+      description: formData.description,
+      url: formData.url,
+      image: formData.imageFile || undefined,
+    });
+    success.value = "Link created successfully";
+
+    // Reset create form
+    createForm.value = {
+      id: null,
+      title: "",
+      url: "",
+      description: "",
+    };
+
+    // Refresh data
+    setTimeout(async () => {
+      await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
+    }, 500);
+  } catch (err) {
+    error.value = "Failed to create link";
+    console.error("Create error:", err);
+  } finally {
+    isProcessing.value = false;
+  }
+}
+
 function cancelEdit() {
   resetForm();
   editing.value = false;
@@ -195,35 +301,49 @@ function cancelEdit() {
 function resetForm() {
   form.value = {
     id: null,
-    title: "",
+    name: "",
     url: "",
-    image: "",
+    img: "",
     description: "",
     date: "",
   };
 }
-function updateLink() {
-  const index = links.value.findIndex((l) => l.id === form.value.id);
-  if (index !== -1) {
-    links.value[index] = { ...form.value };
-  }
-  cancelEdit();
-}
-function deleteLink(id) {
-  links.value = links.value.filter((link) => link.id !== id);
-}
 
-function editLink(link) {
-  form.value = { ...link };
-  editing.value = true;
-}
 function selectOption(option: { label: string; disabled?: boolean }) {
   if (!option.disabled) {
     selected.value = option.label;
     page.value = option.label as Status;
     open.value = false;
+
+    switch (option.label) {
+      case "Pending":
+        fetchPendingActions();
+        break;
+      case "Approved":
+        fetchStaffLinks();
+        break;
+      case "Create":
+        // Clear any error/success messages when switching to create
+        error.value = "";
+        success.value = "";
+        break;
+    }
   }
 }
+
+async function updateStatic() {
+  await updateSite();
+}
+
+onMounted(async () => {
+  try {
+    await authStore.fetchUser();
+    authStore.listenToAuthChanges();
+    await fetchPendingActions(); // Default view
+  } catch (error) {
+    console.error("Failed to initialize admin page:", error);
+  }
+});
 </script>
 
 <style scoped>

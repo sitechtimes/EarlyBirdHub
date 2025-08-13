@@ -22,54 +22,46 @@
         ></div>
       </div>
       <dailyform v-if="createNew == true" :form="form" @submit="addLink" />
-      <div v-if="links.length && createNew == false" class="space-y-6">
+
+      <!-- Show current daily links in Manage tab -->
+      <div v-if="createNew == true" class="space-y-6 mt-8">
+        <h2 class="text-xl font-bold text-center">Your Current Daily Links</h2>
         <div
+          v-if="staffLinks.length > 0"
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-10 md:m-12"
         >
           <cardTemplate
-            v-for="link in links"
-            :page="'Pending'"
+            v-for="link in staffLinks"
+            :page="'Approved'"
             :admin="false"
             :link="link"
             @edit="editLink"
             @delete="deleteLink"
           />
         </div>
+        <div v-else class="text-center text-gray-400 py-8">
+          No daily links found. Create your first one above!
+        </div>
       </div>
-    </div>
-    <div
-      v-else
-      class="min-h-screen w-full flex items-center justify-center bg-black text-gold px-4"
-    >
-      <form
-        @submit.prevent="handleLogin"
-        class="bg-zinc-900 p-6 rounded-xl border border-gold w-full max-w-md space-y-4"
-      >
-        <h2 class="text-2xl font-bold text-center border-b border-gold pb-2">
-          Login
-        </h2>
-        <input
-          v-model="email"
-          type="email"
-          placeholder="Email"
-          class="w-full bg-black border border-gold p-2 rounded"
-          required
-        />
-        <input
-          v-model="password"
-          type="password"
-          placeholder="Password"
-          class="w-full bg-black border border-gold p-2 rounded"
-          required
-        />
-        <div v-if="error" class="text-red-400 text-sm">{{ error }}</div>
-        <button
-          type="submit"
-          class="w-full bg-gold text-black font-bold py-2 px-4 rounded"
+
+      <!-- Show pending links in Pending tab -->
+      <div v-if="createNew == false" class="space-y-6">
+        <h2 class="text-xl font-bold text-center">Pending Approval</h2>
+        <div
+          v-if="pendingActions.length > 0"
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-10 md:m-12"
         >
-          Login
-        </button>
-      </form>
+          <cardTemplate
+            v-for="link in pendingActions"
+            :page="'Pending'"
+            :admin="false"
+            :link="link"
+          />
+        </div>
+        <div v-else class="text-center text-gray-400 py-8">
+          No pending submissions.
+        </div>
+      </div>
     </div>
 
     <div
@@ -83,11 +75,19 @@
 
 <script setup lang="ts">
 import { useDailyLinks } from "~/composables/useDailyLinks";
-import { ref, watch, onMounted, onBeforeUnmount, nextTick } from "vue";
+import {
+  ref,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+  nextTick,
+  computed,
+} from "vue";
 import edit from "~/components/edit.vue";
 import cardTemplate from "~/components/cardTemplate.vue";
 import type { Form } from "~/types/type";
 import dailyform from "~/components/dailyform.vue";
+
 // Add middleware to protect this page
 definePageMeta({
   middleware: ["auth"],
@@ -96,11 +96,14 @@ definePageMeta({
 // Composables
 const {
   staffLinks,
+  pendingActions,
   fetchStaffLinks,
+  fetchPendingActions,
   createLink,
   submitEditRequest,
   submitDeleteRequest,
 } = useDailyLinks();
+
 const authStore = useAuthStore();
 const loggedIn = computed(() => authStore.user !== null);
 
@@ -111,14 +114,27 @@ const email = ref("");
 const password = ref("");
 const editing = ref(false);
 const isUploading = ref(false);
-const isProcessing = ref(false); // Add processing state
+const isProcessing = ref(false);
 const selectedFile = ref<File | null>(null);
 const createNew = ref(true);
-const tab1 = ref<HTMLElement | null>(null); //start as null, then assigned to DOM elements
+const tab1 = ref<HTMLElement | null>(null);
 const tab2 = ref<HTMLElement | null>(null);
 const underlineLeft = ref(0);
 const underlineWidth = ref(0);
 
+// Use pending actions for the "Pending Links" tab
+const links = computed(() =>
+  createNew.value ? staffLinks.value : pendingActions.value
+);
+
+const form = ref<Form>({
+  id: null as string | null,
+  title: "",
+  url: "",
+  description: "",
+});
+
+// Methods
 function updateUnderline() {
   const activeTab = createNew.value ? tab1.value : tab2.value;
   if (activeTab) {
@@ -127,143 +143,153 @@ function updateUnderline() {
   }
 }
 
-const form = ref({
-  id: null as string | null,
-  title: "",
-  url: "",
-  description: "",
-  date: "",
-});
-
-// Methods
-function navigateToAdmin() {
-  navigateTo("/admin");
-const editing = ref(false);
-
-
 function clearMessages() {
   error.value = "";
   success.value = "";
 }
 
-function handleFileSelect(event: Event) {
-  const target = event.target as HTMLInputElement;
-  if (target.files && target.files[0]) {
-    selectedFile.value = target.files[0];
+async function addLink(formData: any) {
+  if (isProcessing.value) return;
+
+  isProcessing.value = true;
+  clearMessages();
+
+  try {
+    await createLink({
+      name: formData.title,
+      description: formData.description,
+      url: formData.url,
+      image: formData.imageFile || undefined, // Use undefined if no file selected
+    });
+
+    success.value = "Link submitted for review";
+
+    // Reset form
+    form.value = {
+      id: null,
+      title: "",
+      url: "",
+      description: "",
+    };
+
+    // Refresh data to show updated lists
+    await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
+  } catch (err: any) {
+    error.value = err.message || "Failed to create link";
+  } finally {
+    isProcessing.value = false;
   }
 }
 
-function resetForm() {
-  form.value = { id: null, title: "", url: "", description: "", date: "" };
-  selectedFile.value = null;
+async function deleteLink(id: number | string) {
+  if (confirm("Submit this link for deletion? It will need admin approval.")) {
+    try {
+      await submitDeleteRequest(String(id));
+      success.value = "Delete request submitted for approval";
+
+      // Refresh the data
+      if (createNew.value) {
+        await fetchStaffLinks();
+      } else {
+        await fetchPendingActions();
+      }
+    } catch (err: any) {
+      error.value = err.message || "Failed to submit delete request";
+    }
+  }
 }
 
-function startEdit(link: any) {
+function editLink(link: any) {
   form.value = {
-    id: link._id,
-    title: link.name,
+    id: link.id,
+    title: link.name || link.title,
     url: link.url,
-    description: link.description || "",
-    date: link.date_end || "",
+    image: link.img || link.image,
+    description: link.description,
   };
   editing.value = true;
 }
 
 function cancelEdit() {
   editing.value = false;
-  resetForm();
+  form.value = {
+    id: null,
+    title: "",
+    url: "",
+    description: "",
+  };
 }
 
-async function handleLogin() {
-  try {
-    await authStore.signIn(email.value, password.value);
-    clearMessages();
-  } catch (err) {
-    error.value = "Login failed. Please check your credentials.";
-  }
-}
-
-async function handleCreate() {
-  if (!selectedFile.value) {
-    error.value = "Please select an image";
-    return;
-  }
+async function updateLink(formData: any) {
+  if (isUploading.value || !formData.id) return;
 
   isUploading.value = true;
+  clearMessages();
+
   try {
-    await createLink({
-      name: form.value.title,
-      description: form.value.description,
-      url: form.value.url,
-      date: form.value.date,
-      image: selectedFile.value,
+    await submitEditRequest(String(formData.id), {
+      name: formData.title,
+      description: formData.description,
+      url: formData.url,
+      image: formData.imageFile || formData.image || "", // Use file if available, otherwise existing image
     });
-    success.value = "Link submitted for approval";
-    resetForm();
-  } catch (err) {
-    error.value = "Failed to create link";
-  } finally {
-    isUploading.value = false;
-  }
-}
-
-async function handleUpdateLink() {
-  if (!form.value.id) return;
-
-  isUploading.value = true;
-  try {
-    let updateData: any = {
-      name: form.value.title,
-      url: form.value.url,
-      description: form.value.description,
-      date: form.value.date,
-    };
-
-    if (selectedFile.value) {
-      updateData.img = selectedFile.value; // Pass the File object directly
-    }
-
-    await submitEditRequest(form.value.id, updateData);
     success.value = "Edit request submitted for approval";
     editing.value = false;
-    resetForm();
-  } catch (err) {
-    error.value = "Failed to submit edit request";
+
+    // Reset form
+    form.value = {
+      id: null,
+      title: "",
+      url: "",
+      description: "",
+    };
+
+    // Refresh data
+    if (createNew.value) {
+      await fetchStaffLinks();
+    } else {
+      await fetchPendingActions();
+    }
+  } catch (err: any) {
+    error.value = err.message || "Failed to submit edit request";
   } finally {
     isUploading.value = false;
   }
 }
 
-async function handleDelete(id: string) {
-  if (confirm("Submit this link for deletion? It will need admin approval.")) {
-    try {
-      await submitDeleteRequest(id);
-      success.value = "Delete request submitted for approval";
-    } catch (err) {
-      error.value = "Failed to submit delete request";
-    }
-  }
-}
+// Watch for tab changes
+watch(createNew, () => {
+  nextTick(() => {
+    updateUnderline();
 
-// Initialize authentication on component mount
+    // Fetch appropriate data
+    if (createNew.value) {
+      fetchStaffLinks().then(() => {
+        console.log("Staff links fetched:", staffLinks.value);
+      });
+    } else {
+      fetchPendingActions().then(() => {
+        console.log("Pending actions fetched:", pendingActions.value);
+      });
+    }
+  });
+});
+
+// Initialize on mount
 onMounted(async () => {
   try {
     await authStore.fetchUser();
     authStore.listenToAuthChanges();
+
+    // Fetch both staff links and pending actions
+    await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
+
+    nextTick(() => {
+      updateUnderline();
+    });
   } catch (error) {
     console.log("User not authenticated");
   }
-});
-</script>
-onMounted(() => {
-  updateUnderline();
-  window.addEventListener("resize", updateUnderline);
-  links.value.forEach((link) => {
-    if (link.img) {
-      const img = new Image();
-      img.src = link.img;
-    }
-  });
 });
 
 onBeforeUnmount(() => {

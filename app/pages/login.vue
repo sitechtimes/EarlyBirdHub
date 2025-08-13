@@ -5,25 +5,28 @@
     >
       <h2 class="w-2/3 text-white text-4xl">Welcome!</h2>
       <input
-        class="w-2/3 p-3 bg-white/10 rounded-lg"
-        type="text"
+        v-model="email"
+        class="w-2/3 p-3 bg-white/10 rounded-lg text-white"
+        type="email"
         placeholder="Enter your email"
+        required
       />
       <div class="w-2/3 flex flex-col gap-1">
         <input
-          class="w-full p-3 bg-white/10 rounded-lg"
-          type="text"
+          v-model="password"
+          class="w-full p-3 bg-white/10 rounded-lg text-white"
+          type="password"
           placeholder="Enter your password"
+          required
         />
-        <p class="mx-2 text-gold underline cursor-pointer text-sm">
-          Forgot your password?
-        </p>
       </div>
 
       <button
-        class="relative w-2/3 p-3 rounded-lg cursor-pointer border-2 border-yellow-400 font-medium text-white overflow-hidden"
+        @click="handleLogin"
+        :disabled="isLoading"
+        class="relative w-2/3 p-3 rounded-lg cursor-pointer border-2 border-yellow-400 font-medium text-white overflow-hidden disabled:opacity-50"
       >
-        Login
+        {{ isLoading ? "Signing in..." : "Login" }}
       </button>
     </div>
     <div class="w-1/2 hidden md:inline rounded-3xl m-6 overflow-auto">

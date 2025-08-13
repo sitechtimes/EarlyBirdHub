@@ -1,6 +1,6 @@
 <template>
   <form
-    @submit.prevent="emit('edit', form)"
+    @submit.prevent="handleSubmit"
     class="bg-zinc-900 p-8 flex flex-col rounded-xl bg-black/30 backdrop-blur border border-gold w-[90%] max-w-lg space-y-4"
   >
     <div
@@ -18,10 +18,11 @@
     </div>
     <Input v-model="props.form.title" inputType="text" placeholder="Title" />
     <Input v-model="props.form.url" inputType="text" placeholder="URL" />
-    <Input
-      v-model="props.form.image"
-      inputType="text"
-      placeholder="Image URL"
+    <input
+      type="file"
+      accept="image/*"
+      @change="handleFileSelect"
+      class="w-full p-2 border border-gray-300 bg-white text-gold rounded focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
     />
     <textarea
       v-model="props.form.description"
@@ -29,7 +30,6 @@
       name="description"
       id=""
     ></textarea>
-    <Input v-model="props.form.date" inputType="date" placeholder="Date" />
     <div class="flex self-end">
       <button
         type="submit"
@@ -42,21 +42,33 @@
 </template>
 
 <script setup lang="ts">
-interface Form {
-  id?: null;
-  title?: string;
-  url?: string;
-  image?: string;
-  description?: string;
-  date?: string;
-}
+import type { Form } from "~/types/type";
+import { ref } from "vue";
+
 const emit = defineEmits<{
-  (e: "edit", form: Form): void;
+  (e: "edit", form: Form & { imageFile?: File }): void;
   (e: "cancel"): void;
 }>();
 const props = defineProps<{
   form: Form;
 }>();
+
+const selectedFile = ref<File | null>(null);
+
+function handleFileSelect(event: Event) {
+  const target = event.target as HTMLInputElement;
+  if (target.files && target.files[0]) {
+    selectedFile.value = target.files[0];
+  }
+}
+
+function handleSubmit() {
+  const formData = {
+    ...props.form,
+    imageFile: selectedFile.value || undefined,
+  };
+  emit("edit", formData);
+}
 </script>
 
 <style scoped></style>

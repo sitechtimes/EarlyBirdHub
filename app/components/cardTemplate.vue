@@ -2,8 +2,8 @@
   <div
     class="h-full border-[1px] border-white pt-32 rounded-3xl overflow-hidden bg-cover bg-center relative text-white shadow-lg"
     :style="{
-      backgroundImage: props.link.image ? `url(${props.link.image})` : 'none',
-      backgroundColor: props.link.image ? '' : 'white',
+      backgroundImage: props.link.img ? `url(${props.link.img})` : 'none',
+      backgroundColor: props.link.img ? '' : 'white',
     }"
   >
     <div
@@ -11,37 +11,41 @@
     ></div>
     <div class="relative p-5 flex flex-col justify-end h-full space-y-2">
       <div class="flex items-center justify-between">
-        <h3 class="text-xl font-semibold">{{ props.link.title }}</h3>
+        <h3 class="text-xl font-semibold">{{ props.link.name }}</h3>
       </div>
-      <p class="text-sm text-white/80">
-        {{ props.link.description || "No description provided." }}
+      <p class="text-sm text-white/80" v-if="props.link.description">
+        {{ props.link.description }}
       </p>
       <div class="flex flex-wrap gap-2 text-sm">
         <h4 class="bg-black/30 text-white px-2 py-1 rounded-full">
           Date: {{ props.link.date }}
         </h4>
-        <h4 class="bg-black/30 text-white px-2 py-1 rounded-full">
+        <h4
+          v-if="props.link.url"
+          class="bg-black/30 text-white px-2 py-1 rounded-full"
+        >
           {{ props.link.url }}
         </h4>
       </div>
       <div class="flex w-full gap-2">
         <button
           v-if="props.page === 'Pending' && props.admin === true"
+          @click="emit('approve', props.link.id)"
           class="mt-4 w-full bg-gold text-black font-semibold py-2 rounded-full hover:bg-white duration-200 transition"
         >
           Approve
         </button>
         <button
           v-if="props.page === 'Pending' && props.admin === true"
+          @click="emit('reject', props.link.id)"
           class="mt-4 w-full bg-gold text-black font-semibold py-2 rounded-full hover:bg-white duration-200 transition"
         >
           Decline
         </button>
         <button
           v-if="
-            (props.page === 'Pending' && props.admin === false) ||
-            props.page === 'Approved' ||
-            props.page === 'Update'
+            (props.page === 'Approved' || props.page === 'Update') &&
+            props.admin === true
           "
           @click="emit('edit', props.link)"
           class="text-black font-medium cursor-pointer py-2 w-full bg-gold rounded-full"
@@ -50,9 +54,8 @@
         </button>
         <button
           v-if="
-            (props.page === 'Pending' && props.admin === false) ||
-            props.page === 'Approved' ||
-            props.page === 'Update'
+            (props.page === 'Approved' || props.page === 'Update') &&
+            props.admin === true
           "
           @click="emit('delete', props.link.id)"
           class="relative group cursor-pointer flex-col h-10 aspect-square bg-gold rounded-full gap-[1px] flex items-center justify-center"
@@ -79,9 +82,9 @@
 <script setup lang="ts">
 interface Link {
   id: number;
-  title: string;
+  name: string;
   url?: string;
-  image?: string;
+  img?: string;
   description?: string;
   date: string;
   approved?: boolean;
@@ -89,13 +92,15 @@ interface Link {
 
 const props = defineProps<{
   link: Link;
-  page: "Pending" | "Approved" | "Update";
+  page: "Pending" | "Approved" | "Create" | "Update";
   admin: boolean;
 }>();
 
 const emit = defineEmits<{
   (e: "edit", link: Link): void;
   (e: "delete", id: number): void;
+  (e: "approve", id: number): void;
+  (e: "reject", id: number): void;
 }>();
 </script>
 

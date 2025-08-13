@@ -227,25 +227,6 @@ const updateRandomPositions = () => {
 };
 
 onMounted(async () => {
-  // Check authentication and redirect if needed
-  try {
-    await authStore.fetchUser();
-
-    if (authStore.user) {
-      if (authStore.isAdmin) {
-        await navigateTo("/admin");
-        return;
-      } else if (authStore.isStaff) {
-        await navigateTo("/dailymanagement");
-        return;
-      }
-    }
-  } catch (error) {
-    // User not authenticated, stay on home page
-    console.log("User not authenticated, staying on home page");
-  }
-
-  // Original seagull animation logic
   isClient.value = true;
   updateRandomPositions();
 

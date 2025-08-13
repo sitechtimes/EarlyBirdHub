@@ -1,394 +1,238 @@
 <template>
-  <div class="min-h-screen bg-black text-gold p-6">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold border-b border-gold pb-3">
-        Admin Dashboard
-      </h1>
+  <div class="w-full h-full flex flex-col items-center">
+    <!-- Dropdown -->
+    <div class="w-full flex justify-center relative mt-5">
       <button
-        @click="authStore.signOut"
-        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+        @click="open = !open"
+        class="w-1/2 flex justify-between items-center bg-white border border-gray-200 rounded-xl px-4 py-2 text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
       >
-        Logout
+        {{ selected || "Pending" }}
+        <i
+          class="fa-solid fa-caret-up text-gold transition-transform"
+          :class="{ 'rotate-180': open }"
+        ></i>
       </button>
-    </div>
-
-    <!-- Mode Toggle -->
-    <div class="flex gap-4 mb-6">
-      <button @click="switchToPending" :class="toggleButtonClass('pending')">
-        ⏳ Pending Actions
-      </button>
-      <button @click="switchToRejected" :class="toggleButtonClass('rejected')">
-        ❌ Rejected Items
-      </button>
-      <button @click="switchToAll" :class="toggleButtonClass('all')">
-        📋 All Links
-      </button>
-    </div>
-
-    <!-- Messages -->
-    <div
-      v-if="error"
-      class="bg-red-900/50 border border-red-500 text-red-200 px-4 py-2 rounded mb-4"
-    >
-      {{ error }}
-    </div>
-    <div
-      v-if="success"
-      class="bg-green-900/50 border border-green-500 text-green-200 px-4 py-2 rounded mb-4"
-    >
-      {{ success }}
-    </div>
-
-    <!-- Pending Actions View -->
-    <div v-if="adminMode === 'pending'" class="space-y-4">
-      <h2 class="text-2xl font-semibold">Pending Actions</h2>
-      <div
-        v-if="pendingActions.length === 0"
-        class="text-center py-8 text-gray-400"
-      >
-        No pending actions
-      </div>
-      <div v-else class="space-y-4">
+      <transition name="fade">
         <div
-          v-for="action in pendingActions"
-          :key="action._id"
-          class="border border-gold p-4 rounded-xl bg-zinc-950"
+          v-if="open"
+          class="absolute top-full mt-2 w-1/2 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50"
         >
-          <div class="flex justify-between items-start mb-3">
-            <div>
-              <h3 class="text-xl font-semibold text-gold">
-                {{ action.name }}
-              </h3>
-              <span class="text-sm text-gray-400 uppercase">
-                {{ action.action_type }}
-              </span>
-              <p class="text-xs text-gray-400">
-                {{ new Date(action.created_at).toLocaleString() }}
-              </p>
-            </div>
-            <div class="flex gap-2">
-              <button
-                @click="handleApprove(action.id)"
-                :disabled="isProcessing"
-                class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                ✓ Approve
-              </button>
-              <button
-                @click="handleReject(action.id)"
-                :disabled="isProcessing"
-                class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                ✗ Reject
-              </button>
-            </div>
-          </div>
-
-          <div v-if="action.description" class="text-sm mb-2">
-            <strong>Description:</strong> {{ action.description }}
-          </div>
-          <div v-if="action.url" class="text-sm mb-2">
-            <strong>URL:</strong>
-            <a
-              :href="action.url"
-              target="_blank"
-              class="text-blue-400 hover:underline"
-              >{{ action.url }}</a
-            >
-          </div>
-          <div v-if="action.date" class="text-sm mb-2">
-            <strong>Date:</strong> {{ action.date }}
-          </div>
-          <img
-            v-if="action.img"
-            :src="action.img"
-            alt="Preview"
-            class="w-20 h-20 object-cover rounded border border-gold"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- Rejected Items View -->
-    <div v-if="adminMode === 'rejected'" class="space-y-4">
-      <h2 class="text-2xl font-semibold">Rejected Items</h2>
-      <div
-        v-if="rejectedActions.length === 0"
-        class="text-center py-8 text-gray-400"
-      >
-        No rejected items
-      </div>
-      <div v-else class="space-y-4">
-        <div
-          v-for="action in rejectedActions"
-          :key="action._id"
-          class="border border-red-500 p-4 rounded-xl bg-zinc-950"
-        >
-          <div class="flex justify-between items-start mb-3">
-            <div>
-              <h3 class="text-xl font-semibold text-gold">
-                {{ action.name }}
-              </h3>
-              <span class="text-sm text-gray-400 uppercase">
-                {{ action.action_type }}
-              </span>
-            </div>
-            <div class="flex gap-2">
-              <button
-                @click="handlePermanentDelete(action.id)"
-                :disabled="isProcessing"
-                class="bg-red-800 text-white px-3 py-1 rounded text-sm hover:bg-red-900"
-              >
-                🗑️ Delete Forever
-              </button>
-            </div>
-          </div>
-          <div v-if="action.description" class="text-sm mb-2">
-            <strong>Description:</strong> {{ action.description }}
-          </div>
-          <div v-if="action.url" class="text-sm mb-2">
-            <strong>URL:</strong>
-            <a
-              :href="action.url"
-              target="_blank"
-              class="text-blue-400 hover:underline"
-              >{{ action.url }}</a
-            >
-          </div>
-          <img
-            v-if="action.img"
-            :src="action.img"
-            alt="Preview"
-            class="w-20 h-20 object-cover rounded border border-gold"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- All Links View -->
-    <div v-if="adminMode === 'all'" class="space-y-4">
-      <h2 class="text-2xl font-semibold">All Approved Links</h2>
-      <div
-        v-if="staffLinks.length"
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
-      >
-        <div
-          v-for="link in staffLinks"
-          :key="link._id"
-          class="border border-gold p-3 rounded-xl bg-zinc-950"
-        >
-          <img
-            v-if="link.img"
-            :src="link.img"
-            alt=""
-            class="w-full h-32 object-cover rounded mb-2"
-          />
-          <h3 class="font-semibold text-gold">{{ link.name }}</h3>
-          <p class="text-sm text-gray-300 mb-2">{{ link.description }}</p>
-          <a
-            :href="link.url"
-            target="_blank"
-            class="text-blue-400 hover:underline text-sm block mb-3"
-            >{{ link.url }}</a
+          <div
+            v-for="(option, index) in options"
+            :key="index"
+            @click="selectOption(option)"
+            :class="[
+              'px-4 py-2 cursor-pointer select-none font-medium',
+              option.disabled
+                ? 'text-gray-400 cursor-not-allowed'
+                : 'hover:bg-gray-100 text-gray-700 font-medium',
+            ]"
           >
-          <div class="flex gap-2">
-            <button
-              @click="handleDirectDelete(link.id)"
-              :disabled="isProcessing"
-              class="bg-red-600 text-white px-2 py-1 rounded text-sm hover:bg-red-700"
-            >
-              🗑️ Delete
-            </button>
+            {{ option.label }}
           </div>
         </div>
+      </transition>
+    </div>
+    <button
+      @click=""
+      v-if="selected === 'Update'"
+      class="p-2 bg-white rounded-lg text-gold w-1/2 mt-5"
+    >
+      Update Website
+    </button>
+    <!-- Cards -->
+    <div class="p-16">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <cardTemplate
+          v-for="link in links"
+          :key="link.id"
+          :link="link"
+          :page="page"
+          :admin="true"
+          @edit="editLink"
+          @delete="deleteLink"
+        />
       </div>
+    </div>
+    <div
+      v-if="editing"
+      class="fixed inset-0 bg-black/60 flex items-center justify-center"
+    >
+      <edit :form="form" @edit="updateLink" @cancel="cancelEdit" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useDailyLinks } from "~/composables/useDailyLinks";
+import cardTemplate from "~/components/cardTemplate.vue";
 
-// Add middleware to protect this page
-definePageMeta({
-  middleware: ["auth", "admin"],
+type Status = "Pending" | "Approved" | "Update";
+const form = ref({
+  id: null,
+  title: "",
+  url: "",
+  image: "",
+  description: "",
+  date: "",
 });
 
-// Composables
-const {
-  staffLinks,
-  pendingActions,
-  rejectedActions,
-  fetchStaffLinks,
-  fetchPendingActions,
-  fetchRejectedActions,
-  approveAction,
-  rejectAction,
-} = useDailyLinks();
+const editing = ref(false);
+const page = ref<Status>("Pending");
+const open = ref(false);
+const selected = ref<string | null>(null);
 
-const authStore = useAuthStore();
+const options = [
+  { label: "Pending", disabled: false },
+  { label: "Approved", disabled: false },
+  { label: "Update", disabled: false },
+];
 
-// State
-const adminMode = ref<"pending" | "rejected" | "all">("pending");
-const error = ref("");
-const success = ref("");
-const isProcessing = ref(false);
-
-// Methods
-function toggleButtonClass(mode: "pending" | "rejected" | "all") {
-  return [
-    "px-4 py-2 rounded-lg font-semibold transition-colors",
-    adminMode.value === mode
-      ? "bg-gold text-black"
-      : "bg-black border border-gold text-gold hover:bg-gold hover:text-black",
-  ];
+const links = ref<DailyLink[]>([
+  {
+    id: 1,
+    title: "School Spirit Day Flyer",
+    url: "https://example.com/spiritday",
+    image: "",
+    description: "Wear your house colors this Friday!",
+    date: new Date("2025/08/05").toDateString(),
+  },
+  {
+    id: 2,
+    title: "Math Club Meeting",
+    url: "https://example.com/mathclub",
+    image:
+      "https://www.istockphoto.com/photo/cute-ginger-cat-gm1443562748-482502032",
+    description: "Join us after school in Room 204.",
+    date: new Date("2025/08/04").toDateString(),
+  },
+  {
+    id: 3,
+    title: "SAT Registration Deadline",
+    url: "https://example.com/sat",
+    image:
+      "https://media.istockphoto.com/id/1443562748/photo/cute-ginger-cat.jpg?s=612x612&w=0&k=20&c=vvM97wWz-hMj7DLzfpYRmY2VswTqcFEKkC437hxm3Cg=",
+    date: new Date("2025/07/28").toDateString(),
+  },
+  {
+    id: 4,
+    title: "Science Fair Registration",
+    url: "https://example.com/sciencefair",
+    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+    description: "Sign up by August 1st to participate.",
+    date: new Date("2025/08/01").toDateString(),
+  },
+  {
+    id: 5,
+    title: "Drama Club Auditions",
+    url: "https://example.com/drama",
+    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+    description: "Auditions held in the auditorium after school.",
+    date: new Date("2025/08/02").toDateString(),
+  },
+  {
+    id: 6,
+    title: "Chess Tournament",
+    url: "https://example.com/chess",
+    image: "",
+    description: "Register your team by August 3rd.",
+    date: new Date("2025/08/03").toDateString(),
+  },
+  {
+    id: 7,
+    title: "Art Exhibition",
+    url: "https://example.com/art",
+    image: "https://images.unsplash.com/photo-1464983953574-0892a716854b",
+    description: "Visit the art room to see student work.",
+    date: new Date("2025/08/04").toDateString(),
+  },
+  {
+    id: 8,
+    title: "Football Tryouts",
+    url: "https://example.com/football",
+    image: "",
+    description: "Tryouts start at 3:30pm on the field.",
+    date: new Date("2025/08/05").toDateString(),
+  },
+  {
+    id: 9,
+    title: "Library Book Return",
+    url: "https://example.com/library",
+    image: "",
+    description: "Return overdue books by August 2nd.",
+    date: new Date("2025/08/02").toDateString(),
+  },
+  {
+    id: 10,
+    title: "Parent-Teacher Conferences",
+    url: "https://example.com/conferences",
+    image: "https://images.unsplash.com/photo-1513258496099-48168024aec0",
+    description: "Schedule your meeting online.",
+    date: new Date("2025/08/03").toDateString(),
+  },
+  {
+    id: 11,
+    title: "Yearbook Orders",
+    url: "https://example.com/yearbook",
+    image: "",
+    description: "Order your yearbook before August 4th.",
+    date: new Date("2025/08/04").toDateString(),
+  },
+  {
+    id: 12,
+    title: "Volunteer Sign-Up",
+    url: "https://example.com/volunteer",
+    image: "",
+    description: "Help out at upcoming school events.",
+    date: new Date("2025/08/05").toDateString(),
+  },
+]);
+function cancelEdit() {
+  resetForm();
+  editing.value = false;
 }
 
-function switchToPending() {
-  adminMode.value = "pending";
-  clearMessages();
-  fetchPendingActions();
+function resetForm() {
+  form.value = {
+    id: null,
+    title: "",
+    url: "",
+    image: "",
+    description: "",
+    date: "",
+  };
+}
+function updateLink() {
+  const index = links.value.findIndex((l) => l.id === form.value.id);
+  if (index !== -1) {
+    links.value[index] = { ...form.value };
+  }
+  cancelEdit();
+}
+function deleteLink(id) {
+  links.value = links.value.filter((link) => link.id !== id);
 }
 
-function switchToRejected() {
-  adminMode.value = "rejected";
-  clearMessages();
-  fetchRejectedActions();
+function editLink(link) {
+  form.value = { ...link };
+  editing.value = true;
 }
-
-function switchToAll() {
-  adminMode.value = "all";
-  clearMessages();
-  fetchStaffLinks();
-}
-
-function clearMessages() {
-  error.value = "";
-  success.value = "";
-}
-
-async function handleApprove(actionId: string) {
-  if (isProcessing.value) return;
-
-  isProcessing.value = true;
-  clearMessages();
-
-  try {
-    console.log("Approving action:", actionId);
-    const result = await approveAction(actionId);
-    console.log("Approval result:", result);
-
-    success.value = "Action approved successfully";
-
-    // Refresh views
-    setTimeout(async () => {
-      await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
-      console.log("Views refreshed after approval");
-    }, 500);
-  } catch (err) {
-    error.value = "Failed to approve action";
-    console.error("Approve error:", err);
-  } finally {
-    isProcessing.value = false;
+function selectOption(option: { label: string; disabled?: boolean }) {
+  if (!option.disabled) {
+    selected.value = option.label;
+    page.value = option.label as Status;
+    open.value = false;
   }
 }
-
-async function handleReject(actionId: string) {
-  if (isProcessing.value) return;
-
-  isProcessing.value = true;
-  clearMessages();
-
-  try {
-    console.log("Rejecting action:", actionId);
-    await rejectAction(actionId);
-    success.value = "Action rejected successfully";
-
-    setTimeout(async () => {
-      await fetchPendingActions();
-      console.log("Pending actions refreshed after rejection");
-    }, 500);
-  } catch (err) {
-    error.value = "Failed to reject action";
-    console.error("Reject error:", err);
-  } finally {
-    isProcessing.value = false;
-  }
-}
-
-async function handlePermanentDelete(actionId: string) {
-  if (isProcessing.value) return;
-
-  if (
-    !confirm(
-      "Are you sure you want to permanently delete this item? This cannot be undone."
-    )
-  ) {
-    return;
-  }
-
-  isProcessing.value = true;
-  clearMessages();
-
-  try {
-    console.log("Permanently deleting action:", actionId);
-    await $fetch(`/api/daily-links/${actionId}`, { method: "DELETE" });
-    success.value = "Item permanently deleted";
-
-    setTimeout(async () => {
-      await fetchRejectedActions();
-      console.log("Rejected actions refreshed after permanent delete");
-    }, 500);
-  } catch (err) {
-    error.value = "Failed to permanently delete item";
-    console.error("Permanent delete error:", err);
-  } finally {
-    isProcessing.value = false;
-  }
-}
-
-async function handleDirectDelete(linkId: string) {
-  if (isProcessing.value) return;
-
-  if (!confirm("Are you sure you want to delete this approved link?")) {
-    return;
-  }
-
-  isProcessing.value = true;
-  clearMessages();
-
-  try {
-    const { $supabase } = useNuxtApp();
-    const { error } = await $supabase
-      .from("daily_links")
-      .delete()
-      .eq("id", linkId);
-
-    if (error) throw error;
-
-    success.value = "Link deleted successfully";
-
-    setTimeout(async () => {
-      await fetchStaffLinks();
-    }, 500);
-  } catch (err) {
-    error.value = "Failed to delete link";
-    console.error("Delete error:", err);
-  } finally {
-    isProcessing.value = false;
-  }
-}
-
-// Initialize on mount
-onMounted(async () => {
-  try {
-    await authStore.fetchUser();
-    authStore.listenToAuthChanges();
-    await fetchPendingActions(); // Default view
-  } catch (error) {
-    console.error("Failed to initialize admin page:", error);
-  }
-});
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

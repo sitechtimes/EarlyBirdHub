@@ -1,62 +1,37 @@
 <template>
-  <div class="min-h-screen bg-black text-gold flex items-center justify-center">
-    <div class="bg-zinc-900 p-8 rounded-xl border border-gold w-full max-w-md">
-      <div class="text-center mb-6">
-        <h1 class="text-3xl font-bold text-gold mb-2">Early Bird Hub</h1>
-        <h2 class="text-xl text-gray-300">Login</h2>
+  <div class="w-full h-screen flex">
+    <div
+      class="w-full md:w-1/2 h-full flex flex-col items-center justify-center gap-6"
+    >
+      <h2 class="w-2/3 text-white text-4xl">Welcome!</h2>
+      <input
+        class="w-2/3 p-3 bg-white/10 rounded-lg"
+        type="text"
+        placeholder="Enter your email"
+      />
+      <div class="w-2/3 flex flex-col gap-1">
+        <input
+          class="w-full p-3 bg-white/10 rounded-lg"
+          type="text"
+          placeholder="Enter your password"
+        />
+        <p class="mx-2 text-gold underline cursor-pointer text-sm">
+          Forgot your password?
+        </p>
       </div>
 
-      <form @submit.prevent="handleLogin" class="space-y-4">
-        <div>
-          <label for="email" class="block text-sm font-medium text-gold mb-1">
-            Email
-          </label>
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            placeholder="Enter your email"
-            class="w-full bg-black border border-gold p-3 rounded focus:outline-none focus:border-yellow-400"
-            required
-          />
-        </div>
-
-        <div>
-          <label
-            for="password"
-            class="block text-sm font-medium text-gold mb-1"
-          >
-            Password
-          </label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            placeholder="Enter your password"
-            class="w-full bg-black border border-gold p-3 rounded focus:outline-none focus:border-yellow-400"
-            required
-          />
-        </div>
-
-        <div
-          v-if="error"
-          class="bg-red-900/50 border border-red-500 text-red-200 px-4 py-2 rounded"
-        >
-          {{ error }}
-        </div>
-
-        <button
-          type="submit"
-          :disabled="isLoading"
-          class="w-full bg-gold text-black font-bold py-3 px-4 rounded hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {{ isLoading ? "Signing in..." : "Sign In" }}
-        </button>
-      </form>
-
-      <div class="mt-6 text-center text-sm text-gray-400">
-        <p>Use the credentials provided to access your dashboard</p>
-      </div>
+      <button
+        class="relative w-2/3 p-3 rounded-lg cursor-pointer border-2 border-yellow-400 font-medium text-white overflow-hidden"
+      >
+        Login
+      </button>
+    </div>
+    <div class="w-1/2 hidden md:inline rounded-3xl m-6 overflow-auto">
+      <img
+        class="w-full h-full object-cover"
+        src="https://media.discordapp.net/attachments/1392863675022577816/1405027799437148251/raw.png?ex=689d559b&is=689c041b&hm=a4e6d189db596ca0d31ed613b3445d206e694073c44d24b3503bc913a0a3b304&=&format=webp&quality=lossless&width=1676&height=1118"
+        alt=""
+      />
     </div>
   </div>
 </template>

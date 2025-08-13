@@ -52,7 +52,16 @@ export default defineNuxtConfig({
         dir: "public/.well-known",
         maxAge: 60 * 60 * 24 * 365, // 1 year
       },
+      {
+        baseURL: "/daily-links-images",
+        dir: "public/daily-links-images",
+        maxAge: 60 * 60 * 24 * 7, // 1 week
+      },
     ],
+  },
+  routeRules: {
+    // Prevent Vue Router from handling image paths - serve as static assets
+    '/daily-links-images/**': { prerender: false }
   },
   // Suppress Vue Router warnings for image paths
   vue: {

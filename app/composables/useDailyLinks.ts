@@ -502,7 +502,7 @@ export function useDailyLinks() {
 
   async function updateSite() {
     try {
-      await $fetch(`${config.public.backendUrl}deploy`, {
+      await $fetch(`${config.public.backendUrl}build`, {
         method: "POST",
       });
     } catch (error) {

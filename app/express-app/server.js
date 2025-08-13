@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3001;
 app.get("/build", (req, res) => {
   const appPath = path.join(__dirname, "..");
   exec(
-    "netlify deploy --prod --dir=.output/public",
+    "npm run generate && netlify deploy --prod --dir=.output/public",
     { cwd: appPath },
     (err, stdout, stderr) => {
       if (err) {

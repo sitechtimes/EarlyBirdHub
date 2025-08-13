@@ -33,7 +33,7 @@
           <cardTemplate
             v-for="link in staffLinks"
             :page="'Approved'"
-            :admin="false"
+            :admin="true"
             :link="link"
             @edit="editLink"
             @delete="deleteLink"
@@ -102,6 +102,8 @@ const {
   createLink,
   submitEditRequest,
   submitDeleteRequest,
+  approveAction,
+  rejectAction,
 } = useDailyLinks();
 
 const authStore = useAuthStore();
@@ -254,6 +256,28 @@ async function updateLink(formData: any) {
     error.value = err.message || "Failed to submit edit request";
   } finally {
     isUploading.value = false;
+  }
+}
+
+async function approveLink(id: number | string) {
+  try {
+    await approveAction(String(id));
+    success.value = "Link approved successfully";
+    await fetchPendingActions();
+  } catch (err: any) {
+    error.value = err.message || "Failed to approve link";
+  }
+}
+
+async function rejectLink(id: number | string) {
+  if (confirm("Are you sure you want to reject this link?")) {
+    try {
+      await rejectAction(String(id));
+      success.value = "Link rejected successfully";
+      await fetchPendingActions();
+    } catch (err: any) {
+      error.value = err.message || "Failed to reject link";
+    }
   }
 }
 

@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "npm run prebuild && nuxt build",
-    "dev": "nuxt dev --host",
+    "dev": "node --no-deprecation node_modules/nuxt/bin/nuxt.mjs dev --host",
     "generate": "npm run prebuild && nuxt generate",
     "prebuild": "node scripts/prebuild.js",
     "download-images": "node scripts/download-images.js",

@@ -18,7 +18,7 @@
         </h3>
       </div>
       <p
-        class="text-sm bg-black/30 text-white px-2 py-1 rounded-full"
+        class="text-sm bg-black/30 text-white px-2 py-1 rounded-full w-fit"
         v-if="props.link.description"
       >
         {{ props.link.description }}

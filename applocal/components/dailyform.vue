@@ -67,7 +67,22 @@ function handleSubmit() {
   };
   emit("submit", formData);
 
-  window.location.reload();
+  // Clear the form after submission
+  localForm.value = {
+    id: null,
+    title: "",
+    url: "",
+    description: "",
+  };
+  selectedFile.value = null;
+
+  // Reset the file input
+  const fileInput = document.querySelector(
+    'input[type="file"]'
+  ) as HTMLInputElement;
+  if (fileInput) {
+    fileInput.value = "";
+  }
 }
 </script>
 

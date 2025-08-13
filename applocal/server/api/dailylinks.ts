@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     return [];
   }
 
-  // Transform image URLs to relative paths only for static builds
+  // Transform image URLs to Supabase URLs for local development
   const forceTransform = shouldTransformUrls();
   return transformDailyLinksArray(data || [], supabaseUrl, forceTransform);
 });

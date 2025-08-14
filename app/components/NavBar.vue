@@ -45,7 +45,7 @@
     >
       <span
         class="block w-8 h-1 bg-white rounded-sm mb-2 transform transition-all duration-300 origin-center"
-        :class="isOpen ? 'rotate-45 translate-y-1.5' : 'rotate-0 '"
+        :class="isOpen ? 'rotate-45 translate-y-1.5' : 'rotate-0'"
       ></span>
       <span
         class="block w-8 h-1 bg-white rounded-sm transform transition-all duration-300 origin-center"

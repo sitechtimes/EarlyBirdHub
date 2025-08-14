@@ -18,7 +18,7 @@
         </h3>
       </div>
       <p
-        class="text-sm bg-black/30 text-white px-2 py-1 rounded-full w-fit"
+        class="text-sm bg-black/30 w-fit text-white px-2 py-1 rounded-full"
         v-if="link.description"
       >
         {{ link.description }}
@@ -59,20 +59,18 @@
         <button
           v-if="(page === 'Approved' || page === 'Update') && admin === true"
           @click="emit('delete', link.id)"
-          class="relative group cursor-pointer flex-col h-10 aspect-square bg-gold rounded-full gap-[1px] flex items-center justify-center"
+          class="relative group cursor-pointer flex-col h-10 aspect-square bg-gold rounded-full gap-px flex items-center justify-center"
         >
           <div
             class="flex flex-col items-center justify-center transition-all duration-200 group-hover:-translate-y-[2px]"
           >
             <span
-              class="w-3 h-1 bg-black rounded-sm transform"
-              style="clip-path: polygon(20% 40%, 80% 40%, 100% 100%, 0% 100%)"
+              class="w-3 h-1 bg-black rounded-sm transform translate-y-[2px] clip-polygon-custom"
             ></span>
             <span class="w-5 h-1 bg-black rounded"></span>
           </div>
           <div
-            class="w-4 h-[18px] bg-black rounded-b-[4px] transition-transform duration-300"
-            style="clip-path: polygon(0% 0%, 100% 0%, 95% 100%, 5% 100%)"
+            class="w-4 h-[18px] bg-black rounded-b-[4px] transition-transform duration-300 [clip-path:polygon(0%_0%,100%_0%,95%_100%,5%_100%)]"
           ></div>
         </button>
       </div>
@@ -88,7 +86,7 @@ interface Link {
   img?: string;
   description?: string;
   date: string;
-  approved?: boolean;
+  isApproved?: boolean;
 }
 
 const props = defineProps<{

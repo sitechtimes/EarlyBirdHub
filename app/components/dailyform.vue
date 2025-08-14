@@ -6,27 +6,27 @@
     <h3 class="font-bold text-2xl">Link Form</h3>
 
     <Input
-      class="w-[80%] border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold text-black"
-      v-model="localForm.title"
+      class="w-4/5 border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold text-black"
+      v-model="local_form.title"
       inputType="text"
       placeholder="Title"
     />
     <Input
-      v-model="localForm.url"
+      v-model="local_form.url"
       inputType="text"
       placeholder="URL"
-      class="w-[80%] border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold text-black"
+      class="w-4/5 border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold text-black"
     />
     <input
       type="file"
       accept="image/*"
       @change="handleFileSelect"
-      class="w-[80%] p-2 border border-gray-300 bg-white text-black rounded focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
+      class="w-4/5 p-2 border border-gray-300 bg-white text-black rounded focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
     />
     <textarea
-      v-model="localForm.description"
+      v-model="local_form.description"
       placeholder="Description"
-      class="w-[80%] p-2 border border-gray-300 bg-white text-black rounded focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
+      class="w-4/5 p-2 border border-gray-300 bg-white text-black rounded focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
     ></textarea>
     <button
       type="submit"
@@ -50,7 +50,7 @@ const emit = defineEmits<{
 }>();
 
 // Make a local copy of the prop
-const localForm = ref({ ...props.form });
+const local_form = ref({ ...props.form });
 const selectedFile = ref<File | null>(null);
 
 function handleFileSelect(event: Event) {
@@ -62,12 +62,27 @@ function handleFileSelect(event: Event) {
 
 function handleSubmit() {
   const formData = {
-    ...localForm.value,
+    ...local_form.value,
     imageFile: selectedFile.value || undefined,
   };
   emit("submit", formData);
 
-  window.location.reload();
+  // Clear the form after submission
+  local_form.value = {
+    id: null,
+    title: "",
+    url: "",
+    description: "",
+  };
+  selectedFile.value = null;
+
+  // Reset the file input
+  const fileInput = document.querySelector(
+    'input[type="file"]'
+  ) as HTMLInputElement;
+  if (fileInput) {
+    fileInput.value = "";
+  }
 }
 </script>
 

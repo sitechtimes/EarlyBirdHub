@@ -520,12 +520,12 @@ export function useDailyLinks() {
 
   async function updateSite() {
     try {
-      await $fetch(`${config.public.backendUrl}build`, {
-        method: "POST",
-      });
-    } catch (error) {
-      console.error("Failed to notify backend:", error);
-      throw error;
+      const res = await $fetch("/api/build", { method: "POST" });
+      console.log(res);
+      alert("Build started!");
+    } catch (e) {
+      console.error(e);
+      alert("Build failed");
     }
   }
 

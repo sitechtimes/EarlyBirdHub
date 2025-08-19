@@ -49,7 +49,6 @@ const emit = defineEmits<{
   (e: "submit", form: Form & { imageFile?: File }): void;
 }>();
 
-// Make a local copy of the prop
 const local_form = ref({ ...props.form });
 const selectedFile = ref<File | null>(null);
 

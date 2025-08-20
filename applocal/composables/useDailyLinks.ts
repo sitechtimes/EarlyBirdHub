@@ -520,8 +520,7 @@ export function useDailyLinks() {
 
   async function updateSite() {
     try {
-      const res = await $fetch("/api/build", { method: "POST" });
-      console.log(res);
+      await $fetch("/api/build", { method: "POST" });
       alert("Build started!");
     } catch (e) {
       console.error(e);

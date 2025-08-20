@@ -41,7 +41,7 @@ export default defineNuxtConfig({
       supabaseAnonKey: "",
       backendUrl: "",
       url: "",
-      buildKey: ""
+      buildSecret: "",
     },
   },
   pinia: {

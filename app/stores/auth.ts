@@ -4,23 +4,8 @@ import { ref, computed } from "vue";
 export const useAuthStore = defineStore("auth", () => {
   const user = ref<any>(null);
 
-  const userRole = computed(() => {
-    if (!user.value?.email) return null;
-
-    if (user.value.email === "admin@siths.com") {
-      return "admin";
-    } else if (user.value.email === "staff@siths.com") {
-      return "staff";
-    }
-    return null;
-  });
-
-  const isAdmin = computed(() => userRole.value === "admin");
-  const isStaff = computed(() => userRole.value === "staff");
-  const hasFullAccess = computed(() => userRole.value === "admin");
-  const hasBasicAccess = computed(
-    () => userRole.value === "staff" || userRole.value === "admin"
-  );
+  const isAdmin = computed(() => user.value?.email === "admin@siths.com");
+  const isStaff = computed(() => user.value?.email === "staff@siths.com");
 
   const fetchUser = async () => {
     const { $supabase } = useNuxtApp();
@@ -54,11 +39,8 @@ export const useAuthStore = defineStore("auth", () => {
 
   return {
     user,
-    userRole,
     isAdmin,
     isStaff,
-    hasFullAccess,
-    hasBasicAccess,
     fetchUser,
     signIn,
     signOut,

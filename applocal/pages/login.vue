@@ -93,7 +93,6 @@ function redirectBasedOnRole() {
   }
 
   console.log("Redirecting user with email:", authStore.user.email);
-  console.log("User role:", authStore.userRole);
 
   if (authStore.isAdmin) {
     console.log("Redirecting to admin dashboard");

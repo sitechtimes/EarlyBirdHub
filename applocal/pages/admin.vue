@@ -52,7 +52,7 @@
         <div v-for="link in links" :key="link.id" class="min-w-[300px]">
           <cardTemplate
             :link="link"
-            :page="page"
+            :card_status="page"
             :admin="true"
             @approve="handleApprove"
             @reject="handleReject"

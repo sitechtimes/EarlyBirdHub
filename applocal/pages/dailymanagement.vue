@@ -32,7 +32,7 @@
         >
           <cardTemplate
             v-for="link in staffLinks"
-            :page="'Approved'"
+            :card_status="'Approved'"
             :admin="true"
             :link="link"
             @edit="editLink"
@@ -53,7 +53,7 @@
         >
           <cardTemplate
             v-for="link in pendingActions"
-            :page="'Pending'"
+            :card_status="'Pending'"
             :admin="false"
             :link="link"
           />

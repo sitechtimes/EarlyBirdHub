@@ -36,28 +36,34 @@
       </div>
       <div class="flex w-full gap-2">
         <button
-          v-if="page === 'Pending' && admin === true"
+          v-if="card_status === 'Pending' && admin === true"
           @click="emit('approve', link.id)"
           class="mt-4 w-full bg-gold text-black font-semibold py-2 rounded-full hover:bg-white duration-200 transition"
         >
           Approve
         </button>
         <button
-          v-if="page === 'Pending' && admin === true"
+          v-if="card_status === 'Pending' && admin === true"
           @click="emit('reject', link.id)"
           class="mt-4 w-full bg-gold text-black font-semibold py-2 rounded-full hover:bg-white duration-200 transition"
         >
           Decline
         </button>
         <button
-          v-if="(page === 'Approved' || page === 'Update') && admin === true"
+          v-if="
+            (card_status === 'Approved' || card_status === 'Update') &&
+            admin === true
+          "
           @click="emit('edit', link)"
           class="text-black font-medium cursor-pointer py-2 w-full bg-gold rounded-full"
         >
           Edit
         </button>
         <button
-          v-if="(page === 'Approved' || page === 'Update') && admin === true"
+          v-if="
+            (card_status === 'Approved' || card_status === 'Update') &&
+            admin === true
+          "
           @click="emit('delete', link.id)"
           class="relative group cursor-pointer flex-col h-10 aspect-square bg-gold rounded-full gap-px flex items-center justify-center"
         >
@@ -91,7 +97,7 @@ interface Link {
 
 const props = defineProps<{
   link: Link;
-  page: "Pending" | "Approved" | "Create" | "Update";
+  card_status: "Pending" | "Approved" | "Create" | "Update";
   admin: boolean;
 }>();
 

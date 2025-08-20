@@ -25,7 +25,7 @@
           <CardTemplate
             v-if="group.links.length > 0"
             v-for="link in group.links"
-            :page="'Approved'"
+            :card_status="'Approved'"
             :admin="false"
             :link="link"
           />

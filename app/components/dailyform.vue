@@ -1,0 +1,88 @@
+<template>
+  <form
+    @submit.prevent="handleSubmit"
+    class="flex flex-col items-center w-full md:w-3/4 gap-4 bg-white p-5 rounded-3xl"
+  >
+    <h3 class="font-bold text-2xl">Link Form</h3>
+
+    <Input
+      class="w-4/5 border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold text-black"
+      v-model="local_form.title"
+      inputType="text"
+      placeholder="Title"
+    />
+    <Input
+      v-model="local_form.url"
+      inputType="text"
+      placeholder="URL"
+      class="w-4/5 border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold text-black"
+    />
+    <input
+      type="file"
+      accept="image/*"
+      @change="handleFileSelect"
+      class="w-4/5 p-2 border border-gray-300 bg-white text-black rounded focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
+    />
+    <textarea
+      v-model="local_form.description"
+      placeholder="Description"
+      class="w-4/5 p-2 border border-gray-300 bg-white text-black rounded focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
+    ></textarea>
+    <button
+      type="submit"
+      class="bg-gold text-black font-bold py-3 px-9 rounded-full"
+    >
+      Add Link
+    </button>
+  </form>
+</template>
+
+<script setup lang="ts">
+import type { Form } from "~/types/type";
+import { ref } from "vue";
+
+const props = defineProps<{
+  form: Form;
+}>();
+
+const emit = defineEmits<{
+  (e: "submit", form: Form & { imageFile?: File }): void;
+}>();
+
+const local_form = ref({ ...props.form });
+const selectedFile = ref<File | null>(null);
+
+function handleFileSelect(event: Event) {
+  const target = event.target as HTMLInputElement;
+  if (target.files && target.files[0]) {
+    selectedFile.value = target.files[0];
+  }
+}
+
+function handleSubmit() {
+  const formData = {
+    ...local_form.value,
+    imageFile: selectedFile.value || undefined,
+  };
+  emit("submit", formData);
+
+  // Clear the form after submission
+  local_form.value = {
+    id: null,
+    title: "",
+    url: "",
+    description: "",
+  };
+  selectedFile.value = null;
+
+  // Reset the file input
+  const fileInput = document.querySelector(
+    'input[type="file"]'
+  ) as HTMLInputElement;
+  if (fileInput) {
+    fileInput.value = "";
+  }
+}
+</script>
+
+<style scoped></style>

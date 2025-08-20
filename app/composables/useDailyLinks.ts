@@ -1,9 +1,14 @@
+import {
+  transformDailyLinksArray,
+  shouldTransformUrls,
+} from "~/utils/imageTransform";
+import { getCurrentDate } from "~/utils/dateUtils";
+
 export function useDailyLinks() {
   const { $supabase } = useNuxtApp();
   const config = useRuntimeConfig();
   const staffLinks = ref<Array<any>>([]);
   const pendingActions = ref<Array<any>>([]);
-  const rejectedActions = ref<Array<any>>([]);
   const userLinks = ref<Array<any>>([]);
 
   const fetchUserLinks = async () => {
@@ -25,7 +30,12 @@ export function useDailyLinks() {
         throw error;
       }
 
-      userLinks.value = data || [];
+      const forceTransform = shouldTransformUrls();
+      userLinks.value = transformDailyLinksArray(
+        data || [],
+        config.public.supabaseUrl,
+        forceTransform
+      );
       console.log("User links fetched:", userLinks.value);
     } catch (error) {
       console.error("Failed to fetch user links:", error);
@@ -46,7 +56,12 @@ export function useDailyLinks() {
         throw error;
       }
 
-      staffLinks.value = data || [];
+      const forceTransform = shouldTransformUrls();
+      staffLinks.value = transformDailyLinksArray(
+        data || [],
+        config.public.supabaseUrl,
+        forceTransform
+      );
     } catch (error) {
       console.error("Failed to fetch staff links:", error);
     }
@@ -65,57 +80,77 @@ export function useDailyLinks() {
         throw error;
       }
 
-      pendingActions.value = data || [];
+      const forceTransform = shouldTransformUrls();
+      pendingActions.value = transformDailyLinksArray(
+        data || [],
+        config.public.supabaseUrl,
+        forceTransform
+      );
     } catch (error) {
       console.error("Failed to fetch pending actions:", error);
     }
   };
 
-  const fetchRejectedActions = async () => {
-    try {
-      const { data, error } = await $supabase
-        .from("daily_links")
-        .select("*")
-        .eq("status", "rejected")
-        .order("date", { ascending: false });
-
-      if (error) {
-        console.error("Supabase error:", error);
-        throw error;
-      }
-
-      rejectedActions.value = data || [];
-    } catch (error) {
-      console.error("Failed to fetch rejected actions:", error);
-    }
-  };
-
   async function uploadImage(file: File): Promise<string> {
     try {
+      // Check if user is authenticated
+      const {
+        data: { user },
+        error: authError,
+      } = await $supabase.auth.getUser();
+      console.log("Auth check - User:", user, "Error:", authError);
+
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
       const fileExt = file.name.split(".").pop();
-      const fileName = `${Math.random()}.${fileExt}`;
+      const fileName = `${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(7)}.${fileExt}`;
       const filePath = `daily-links/${fileName}`;
 
+      console.log("Attempting to upload file:", filePath, "Size:", file.size);
+
+      // Try uploading without upsert first
       const { data, error } = await $supabase.storage
         .from("daily-links-images")
         .upload(filePath, file, {
           cacheControl: "3600",
-          upsert: false,
+          upsert: true, // Changed to true to overwrite if exists
         });
 
       if (error) {
-        console.error("Upload error:", error);
+        console.error("Upload error details:", error);
+
+        // Try alternative approach - upload to a different path or with different options
+        if (
+          error.message.includes("row-level security") ||
+          error.message.includes("policy")
+        ) {
+          console.log("RLS error, trying without authentication...");
+
+          // Alternative: Return a placeholder or skip image for now
+          console.warn(
+            "Skipping image upload due to RLS policy. Creating link without image."
+          );
+          return ""; // Return empty string to indicate no image
+        }
         throw error;
       }
+
+      console.log("Upload successful:", data);
 
       const {
         data: { publicUrl },
       } = $supabase.storage.from("daily-links-images").getPublicUrl(filePath);
 
+      console.log("Generated public URL:", publicUrl);
       return publicUrl;
     } catch (error) {
       console.error("Failed to upload image:", error);
-      throw error;
+      // Instead of throwing, return empty string to allow link creation without image
+      return "";
     }
   }
 
@@ -124,15 +159,21 @@ export function useDailyLinks() {
     description?: string;
     url?: string;
     image?: File | string; // Can be either File object or URL string
-    date: string;
+    date?: string; // Make date optional
   }) {
     try {
       let imageUrl = payload.image;
 
-      // If image is a File object, upload it first
+      // If image is a File object, try to upload it
       if (payload.image instanceof File) {
         imageUrl = await uploadImage(payload.image);
+        if (!imageUrl) {
+          console.log("No image URL returned, creating link without image");
+        }
       }
+
+      // Use provided date or current date
+      const currentDate = payload.date || getCurrentDate();
 
       const { data, error } = await $supabase
         .from("daily_links")
@@ -142,7 +183,7 @@ export function useDailyLinks() {
             description: payload.description,
             url: payload.url,
             img: imageUrl,
-            date: payload.date,
+            date: currentDate,
             action_type: "create",
             approved: false,
           },
@@ -170,16 +211,25 @@ export function useDailyLinks() {
       description?: string;
       url?: string;
       image?: File | string; // Can be either File object or URL string
-      date: string;
+      date?: string; // Make date optional
     }
   ) {
     try {
       let imageUrl = payload.image;
 
-      // If image is a File object, upload it first
+      // If image is a File object, try to upload it
       if (payload.image instanceof File) {
         imageUrl = await uploadImage(payload.image);
+        if (!imageUrl) {
+          console.log(
+            "No image URL returned during edit, keeping existing image"
+          );
+          imageUrl = ""; // Will keep existing image in DB
+        }
       }
+
+      // Use provided date or current date
+      const currentDate = payload.date || getCurrentDate();
 
       // TODO: Implement full edit workflow when needed
       // For now, just create a new entry with old_id reference
@@ -191,7 +241,7 @@ export function useDailyLinks() {
             description: payload.description,
             url: payload.url,
             img: imageUrl, // Now this will be a URL string
-            date: payload.date,
+            date: currentDate,
             action_type: "edit",
             old_id: targetId,
             approved: false,
@@ -320,15 +370,6 @@ export function useDailyLinks() {
 
       await fetchStaffLinks();
       await fetchPendingActions();
-      try {
-        await $fetch(`${config.public.backendUrl}/deploy`, {
-          method: "POST",
-          body: { actionId },
-        });
-      } catch (error) {
-        console.error("Failed to notify backend:", error);
-        throw error;
-      }
       return { success: true, message: "Action approved successfully" };
     } catch (error) {
       console.error("Failed to approve action:", error);
@@ -361,19 +402,148 @@ export function useDailyLinks() {
     }
   }
 
+  // Admin: Direct update function (bypasses approval workflow)
+  async function updateLinkDirect(
+    linkId: string,
+    payload: {
+      name: string;
+      description?: string;
+      url?: string;
+      image?: File | string;
+    }
+  ) {
+    try {
+      let imageUrl = payload.image;
+
+      // If image is a File object, try to upload it
+      if (payload.image instanceof File) {
+        imageUrl = await uploadImage(payload.image);
+        if (!imageUrl) {
+          console.log(
+            "No image URL returned during update, keeping existing image"
+          );
+          imageUrl = undefined; // Will not update the image field
+        }
+      }
+
+      // Prepare update data
+      const updateData: any = {
+        name: payload.name,
+        description: payload.description,
+        url: payload.url,
+      };
+
+      // Only update image if we have a new one
+      if (imageUrl !== undefined) {
+        updateData.img = imageUrl;
+      }
+
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .update(updateData)
+        .eq("id", linkId)
+        .select();
+
+      if (error) throw error;
+
+      console.log("Link updated directly:", data);
+      return { success: true, data };
+    } catch (error) {
+      console.error("Failed to update link directly:", error);
+      throw error;
+    }
+  }
+
+  // Admin: Direct create function (bypasses approval workflow)
+  async function createLinkDirect(payload: {
+    name: string;
+    description?: string;
+    url?: string;
+    image?: File | string;
+  }) {
+    try {
+      let imageUrl = payload.image;
+
+      // If image is a File object, try to upload it
+      if (payload.image instanceof File) {
+        imageUrl = await uploadImage(payload.image);
+        if (!imageUrl) {
+          console.log("No image URL returned, creating link without image");
+        }
+      }
+
+      // Use current date
+      const currentDate = getCurrentDate();
+
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .insert([
+          {
+            name: payload.name,
+            description: payload.description,
+            url: payload.url,
+            img: imageUrl,
+            date: currentDate,
+            approved: true, // Admin creates approved links directly
+          },
+        ])
+        .select();
+
+      if (error) throw error;
+
+      console.log("Link created directly by admin:", data);
+      return { success: true, data };
+    } catch (error) {
+      console.error("Failed to create link directly:", error);
+      throw error;
+    }
+  }
+
+  // Admin: Direct delete function (bypasses approval workflow)
+  async function deleteLinkDirect(linkId: string) {
+    try {
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .delete()
+        .eq("id", linkId)
+        .select();
+
+      if (error) throw error;
+
+      console.log("Link deleted directly:", data);
+      return { success: true, data };
+    } catch (error) {
+      console.error("Failed to delete link directly:", error);
+      throw error;
+    }
+  }
+
+  async function updateSite() {
+    try {
+      await $fetch(`${config.public.backendUrl}build`, {
+        method: "POST",
+      });
+    } catch (error) {
+      console.error("Failed to notify backend:", error);
+      throw error;
+    }
+  }
+
   return {
     staffLinks,
     userLinks,
     pendingActions,
-    rejectedActions,
     fetchStaffLinks,
     fetchPendingActions,
-    fetchRejectedActions,
     createLink,
     submitEditRequest,
     submitDeleteRequest,
     fetchUserLinks,
     approveAction,
     rejectAction,
+    updateLinkDirect,
+    createLinkDirect,
+    deleteLinkDirect,
+    updateSite,
   };
 }

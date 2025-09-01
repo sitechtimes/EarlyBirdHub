@@ -18,6 +18,7 @@
       class="w-4/5 border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold text-black"
     />
     <input
+      ref="fileInput"
       type="file"
       accept="image/*"
       @change="handleFileSelect"
@@ -53,6 +54,8 @@ const emit = defineEmits<{
 const local_form = ref({ ...props.form });
 const selectedFile = ref<File | null>(null);
 
+const fileInput = useTemplateRef<HTMLInputElement | null>("fileInput");
+
 function handleFileSelect(event: Event) {
   const target = event.target as HTMLInputElement;
   if (target.files && target.files[0]) {
@@ -76,12 +79,9 @@ function handleSubmit() {
   };
   selectedFile.value = null;
 
-  // Reset the file input
-  const fileInput = document.querySelector(
-    'input[type="file"]'
-  ) as HTMLInputElement;
-  if (fileInput) {
-    fileInput.value = "";
+  // Reset the file input using template ref
+  if (fileInput.value) {
+    fileInput.value.value = "";
   }
 }
 </script>

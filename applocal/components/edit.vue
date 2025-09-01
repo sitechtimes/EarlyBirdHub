@@ -16,8 +16,8 @@
         ></span>
       </button>
     </div>
-    <Input v-model="props.form.title" inputType="text" placeholder="Title" />
-    <Input v-model="props.form.url" inputType="text" placeholder="URL" />
+    <Input v-model="form.title" inputType="text" placeholder="Title" />
+    <Input v-model="form.url" inputType="text" placeholder="URL" />
     <input
       type="file"
       accept="image/*"
@@ -25,7 +25,7 @@
       class="w-full p-2 border border-gray-300 bg-white text-gold rounded focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
     />
     <textarea
-      v-model="props.form.description"
+      v-model="form.description"
       placeholder="Description"
       name="description"
       id=""

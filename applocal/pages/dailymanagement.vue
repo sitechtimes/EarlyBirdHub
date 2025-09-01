@@ -85,7 +85,7 @@ import {
 } from "vue";
 import edit from "~/components/edit.vue";
 import cardTemplate from "~/components/cardTemplate.vue";
-import type { Form } from "~/types/type";
+import type { Form } from "~/utils/interfaces";
 import dailyform from "~/components/dailyform.vue";
 
 // Add middleware to protect this page

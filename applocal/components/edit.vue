@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Form } from "~/types/type";
+import type { Form } from "~/utils/interfaces";
 import { ref } from "vue";
 
 const emit = defineEmits<{

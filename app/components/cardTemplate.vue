@@ -7,43 +7,45 @@
     }"
   >
     <div
-      class="absolute inset-0 bg-gradient-to-t backdrop-blur-100 from-black/70 via-black/10 to-transparent z-0"
+      class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent z-0"
     ></div>
     <div class="relative p-5 flex flex-col justify-end h-full space-y-2">
       <div class="flex items-center justify-between">
         <h3
-          class="text-xl font-semibold bg-black/30 text-white px-2 py-1 rounded-full"
+          class="text-xl font-semibold backdrop-blur-sm bg-black/30 text-white px-3 py-1 rounded-full"
         >
           {{ link.name }}
         </h3>
       </div>
       <p
-        class="text-sm bg-black/30 w-fit text-white px-2 py-1 rounded-full"
+        class="text-sm backdrop-blur-sm bg-black/30 w-fit text-white px-2 py-1 rounded-full"
         v-if="link.description"
       >
         {{ link.description }}
       </p>
       <div class="flex flex-wrap gap-2 text-sm">
-        <h4 class="bg-black/30 text-white px-2 py-1 rounded-full">
+        <h4
+          class="backdrop-blur-sm bg-black/30 text-white px-2 py-1 rounded-full"
+        >
           Date: {{ link.date }}
         </h4>
         <h4
           v-if="link.url"
-          class="bg-black/30 text-white px-2 py-1 rounded-full"
+          class="backdrop-blur-sm bg-black/30 text-white px-2 py-1 rounded-full"
         >
           {{ link.url }}
         </h4>
       </div>
       <div class="flex w-full gap-2">
         <button
-          v-if="card_status === 'Pending' && admin === true"
+          v-if="card_status === 'Pending' && admin"
           @click="emit('approve', link.id)"
           class="mt-4 w-full bg-gold text-black font-semibold py-2 rounded-full hover:bg-white duration-200 transition"
         >
           Approve
         </button>
         <button
-          v-if="card_status === 'Pending' && admin === true"
+          v-if="card_status === 'Pending' && admin"
           @click="emit('reject', link.id)"
           class="mt-4 w-full bg-gold text-black font-semibold py-2 rounded-full hover:bg-white duration-200 transition"
         >
@@ -51,8 +53,7 @@
         </button>
         <button
           v-if="
-            (card_status === 'Approved' || card_status === 'Update') &&
-            admin === true
+            (card_status === 'Approved' || card_status === 'Update') && admin
           "
           @click="emit('edit', link)"
           class="text-black font-medium cursor-pointer py-2 w-full bg-gold rounded-full"
@@ -61,8 +62,7 @@
         </button>
         <button
           v-if="
-            (card_status === 'Approved' || card_status === 'Update') &&
-            admin === true
+            (card_status === 'Approved' || card_status === 'Update') && admin
           "
           @click="emit('delete', link.id)"
           class="relative group cursor-pointer flex-col h-10 aspect-square bg-gold rounded-full gap-px flex items-center justify-center"

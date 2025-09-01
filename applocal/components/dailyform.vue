@@ -8,12 +8,12 @@
     <Input
       class="w-4/5 border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold text-black"
       v-model="local_form.title"
-      inputType="text"
+      input-type="text"
       placeholder="Title"
     />
     <Input
       v-model="local_form.url"
-      inputType="text"
+      input-type="text"
       placeholder="URL"
       class="w-4/5 border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold text-black"
     />

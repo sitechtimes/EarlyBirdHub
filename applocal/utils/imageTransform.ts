@@ -87,11 +87,3 @@ export function transformDailyLinksArray(
     transformDailyLinkImages(link, supabaseUrl, forceTransform)
   );
 }
-
-/**
- * Determine if we should transform URLs based on environment
- */
-export function shouldTransformUrls(): boolean {
-  // Always transform URLs to use Supabase URLs for local development
-  return true;
-}

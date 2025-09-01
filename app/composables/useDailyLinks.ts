@@ -1,7 +1,4 @@
-import {
-  transformDailyLinksArray,
-  shouldTransformUrls,
-} from "~/utils/imageTransform";
+import { transformDailyLinksArray } from "~/utils/imageTransform";
 import { getCurrentDate } from "~/utils/dateUtils";
 
 export function useDailyLinks() {
@@ -30,7 +27,7 @@ export function useDailyLinks() {
         throw error;
       }
 
-      const forceTransform = shouldTransformUrls();
+      const forceTransform = true;
       userLinks.value = transformDailyLinksArray(
         data || [],
         config.public.supabaseUrl,
@@ -56,7 +53,7 @@ export function useDailyLinks() {
         throw error;
       }
 
-      const forceTransform = shouldTransformUrls();
+      const forceTransform = true;
       staffLinks.value = transformDailyLinksArray(
         data || [],
         config.public.supabaseUrl,
@@ -80,7 +77,7 @@ export function useDailyLinks() {
         throw error;
       }
 
-      const forceTransform = shouldTransformUrls();
+      const forceTransform = true;
       pendingActions.value = transformDailyLinksArray(
         data || [],
         config.public.supabaseUrl,

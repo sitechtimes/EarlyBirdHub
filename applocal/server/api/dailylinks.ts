@@ -1,8 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import {
-  transformDailyLinksArray,
-  shouldTransformUrls,
-} from "~/utils/imageTransform";
+import { transformDailyLinksArray } from "~/utils/imageTransform";
 
 const config = useRuntimeConfig();
 const supabaseUrl = config.public.supabaseUrl;
@@ -21,6 +18,6 @@ export default defineEventHandler(async (event) => {
   }
 
   // Transform image URLs to Supabase URLs for local development
-  const forceTransform = shouldTransformUrls();
+  const forceTransform = true;
   return transformDailyLinksArray(data || [], supabaseUrl, forceTransform);
 });

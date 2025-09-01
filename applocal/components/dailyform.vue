@@ -7,12 +7,12 @@
 
     <Input
       class="w-4/5 border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold text-black"
-      v-model="local_form.title"
+      v-model="localForm.title"
       input-type="text"
       placeholder="Title"
     />
     <Input
-      v-model="local_form.url"
+      v-model="localForm.url"
       input-type="text"
       placeholder="URL"
       class="w-4/5 border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold text-black"
@@ -25,7 +25,7 @@
       class="w-4/5 p-2 border border-gray-300 bg-white text-black rounded focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
     />
     <textarea
-      v-model="local_form.description"
+      v-model="localForm.description"
       placeholder="Description"
       class="w-4/5 p-2 border border-gray-300 bg-white text-black rounded focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
     ></textarea>
@@ -51,7 +51,7 @@ const emit = defineEmits<{
 }>();
 
 // Make a local copy of the prop
-const local_form = ref({ ...props.form });
+const localForm = ref({ ...props.form });
 const selectedFile = ref<File | null>(null);
 
 const fileInput = useTemplateRef<HTMLInputElement | null>("fileInput");
@@ -65,13 +65,13 @@ function handleFileSelect(event: Event) {
 
 function handleSubmit() {
   const formData = {
-    ...local_form.value,
+    ...localForm.value,
     imageFile: selectedFile.value || undefined,
   };
   emit("submit", formData);
 
   // Clear the form after submission
-  local_form.value = {
+  localForm.value = {
     id: null,
     title: "",
     url: "",

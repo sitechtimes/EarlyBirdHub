@@ -36,8 +36,6 @@
 </template>
 
 <script setup lang="ts">
-import CardTemplate from "~/components/cardTemplate.vue";
-
 const error = ref<any>(null);
 
 const response = await useFetch("/api/dailylinks", { server: true });

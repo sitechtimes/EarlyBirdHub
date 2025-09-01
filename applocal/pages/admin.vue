@@ -43,14 +43,14 @@
 
     <!-- Create Form -->
     <div v-if="selected === 'Create'" class="w-full max-w-2xl mt-8">
-      <dailyform :form="createForm" @submit="handleCreateLink" />
+      <DailyForm :form="createForm" @submit="handleCreateLink" />
     </div>
 
     <!-- Cards -->
     <div v-if="selected !== 'Create'" class="p-16">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <div v-for="link in links" :key="link.id" class="min-w-[300px]">
-          <cardTemplate
+          <CardTemplate
             :link="link"
             :card_status="page"
             :admin="true"
@@ -77,16 +77,13 @@
       v-if="editing"
       class="fixed inset-0 bg-black/60 flex items-center justify-center"
     >
-      <edit :form="form" @edit="updateLink" @cancel="cancelEdit" />
+      <Edit :form="form" @edit="updateLink" @cancel="cancelEdit" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import cardTemplate from "~/components/cardTemplate.vue";
-import dailyform from "~/components/dailyform.vue";
-import { useDailyLinks } from "~/composables/useDailyLinks";
 
 definePageMeta({
   middleware: ["auth", "admin"],

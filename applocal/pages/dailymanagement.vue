@@ -21,7 +21,7 @@
           :style="{ left: underlineLeft + 'px', width: underlineWidth + 'px' }"
         ></div>
       </div>
-      <dailyform v-if="createNew == true" :form="form" @submit="addLink" />
+      <DailyForm v-if="createNew == true" :form="form" @submit="addLink" />
 
       <!-- Show current daily links in Manage tab -->
       <div v-if="createNew == true" class="space-y-6 mt-8">
@@ -30,7 +30,7 @@
           v-if="staffLinks.length > 0"
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-10 md:m-12"
         >
-          <cardTemplate
+          <CardTemplate
             v-for="link in staffLinks"
             :card_status="'Approved'"
             :admin="true"
@@ -51,7 +51,7 @@
           v-if="pendingActions.length > 0"
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-10 md:m-12"
         >
-          <cardTemplate
+          <CardTemplate
             v-for="link in pendingActions"
             :card_status="'Pending'"
             :admin="false"
@@ -68,7 +68,7 @@
       v-if="editing"
       class="fixed inset-0 bg-black/60 flex items-center justify-center"
     >
-      <edit :form="form" @edit="updateLink" @cancel="cancelEdit" />
+      <Edit :form="form" @edit="updateLink" @cancel="cancelEdit" />
     </div>
   </div>
 </template>
@@ -83,10 +83,7 @@ import {
   nextTick,
   computed,
 } from "vue";
-import edit from "~/components/edit.vue";
-import cardTemplate from "~/components/cardTemplate.vue";
 import type { Form } from "~/utils/interfaces";
-import dailyform from "~/components/dailyform.vue";
 
 // Add middleware to protect this page
 definePageMeta({

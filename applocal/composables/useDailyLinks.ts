@@ -532,12 +532,14 @@ export function useDailyLinks() {
   }
 
   async function updateSite() {
-    try {
-      await $fetch("/api/build", { method: "POST" });
-      alert("Build started!");
-    } catch (e) {
-      console.error(e);
-      alert("Build failed");
+    if (confirm("Update Site? This may take up to a few minutes.")) {
+      try {
+        await $fetch("/api/build", { method: "POST" });
+        alert("Build Complete!");
+      } catch (e) {
+        console.error(e);
+        alert("Build failed");
+      }
     }
   }
 

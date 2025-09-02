@@ -1,6 +1,6 @@
 <template>
   <div
-    class="mainpage overflow-y-scroll w-full h-full items-center relative overflow-hidden"
+    class="mainpage overflow-y-scroll w-full h-screen items-center relative overflow-hidden p-3"
   >
     <ClientOnly>
       <div class="absolute inset-0 pointer-events-none">
@@ -179,10 +179,6 @@
 </template>
 
 <script setup lang="ts">
-import Seagull from "~/components/Seagull.vue";
-
-const authStore = useAuthStore();
-
 interface YouTubePlaylistItem {
   id: string;
   snippet: {
@@ -212,6 +208,7 @@ const {
   refresh,
 } = await useFetch<YouTubePlaylistResponse>("/api/playlist");
 
+const useNavBarStore = useNavbarStore();
 const randomY1 = ref(50);
 const randomY2 = ref(50);
 const randomY3 = ref(50);

@@ -1,47 +1,69 @@
 <template>
   <form
     @submit.prevent="handleSubmit"
-    class="flex flex-col items-center w-full md:w-3/4 gap-4 bg-white p-5 rounded-3xl"
+    class="flex flex-col items-center w-full md:w-3/4 gap-6 bg-white p-5 rounded-3xl shadow-lg"
   >
-    <h3 class="font-bold text-2xl">Link Form</h3>
+    <h3 class="font-bold text-3xl text-gray-800 mb-2">Link Form</h3>
 
-    <Input
-      class="w-4/5 border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold text-black"
-      v-model="localForm.title"
-      input-type="text"
-      placeholder="Title"
-    />
-    <Input
-      v-model="localForm.url"
-      input-type="text"
-      placeholder="URL"
-      class="w-4/5 border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold text-black"
-    />
-    <input
-      ref="fileInput"
-      type="file"
-      accept="image/*"
-      @change="handleFileSelect"
-      class="w-4/5 p-2 border border-gray-300 bg-white text-black rounded focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
-    />
-    <textarea
-      v-model="localForm.description"
-      placeholder="Description"
-      class="w-4/5 p-2 border border-gray-300 bg-white text-black rounded focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
-    ></textarea>
-    <button
-      type="submit"
-      class="bg-gold text-black font-bold py-3 px-9 rounded-full"
-    >
-      Add Link
-    </button>
+    <div class="w-4/5 flex flex-col gap-2">
+      <label for="titleInput" class="text-gray-700 font-semibold text-sm">
+        Title *
+      </label>
+      <Input
+        id="titleInput"
+        class="border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold text-black transition-all duration-200"
+        v-model="localForm.title"
+        input-type="text"
+        placeholder="Enter link title"
+        required
+      />
+    </div>
+
+    <div class="w-4/5 flex flex-col gap-2">
+      <label for="urlInput" class="text-gray-700 font-semibold text-sm">
+        URL
+      </label>
+      <Input
+        id="urlInput"
+        v-model="localForm.url"
+        input-type="text"
+        placeholder="https://example.com"
+        class="border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold text-black transition-all duration-200"
+      />
+    </div>
+
+    <div class="w-4/5 flex flex-col gap-2">
+      <label for="fileInput" class="text-gray-700 font-semibold text-sm">
+        Upload Image
+      </label>
+      <input
+        id="fileInput"
+        ref="fileInput"
+        type="file"
+        accept="image/*"
+        @change="handleFileSelect"
+        class="p-3 border border-gray-300 bg-white text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gold file:text-black hover:file:bg-yellow-500"
+      />
+    </div>
+
+    <div class="w-4/5 flex flex-col gap-2">
+      <label for="descriptionInput" class="text-gray-700 font-semibold text-sm">
+        Description
+      </label>
+      <textarea
+        id="descriptionInput"
+        v-model="localForm.description"
+        placeholder="Enter a brief description"
+        rows="4"
+        class="p-3 border border-gray-300 bg-white text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold transition-all duration-200 resize-vertical"
+      ></textarea>
+    </div>
+
+    <button type="submit" class="admin-button">Add Link</button>
   </form>
 </template>
 
 <script setup lang="ts">
-import type { Form } from "~/utils/interfaces";
-import { ref } from "vue";
-
 const props = defineProps<{
   form: Form;
 }>();

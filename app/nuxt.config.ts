@@ -32,6 +32,16 @@ export default defineNuxtConfig({
       viewport:
         "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
       meta: [{ name: "format-detection", content: "telephone=no" }],
+      htmlAttrs: {
+        lang: "en",
+      },
+      link: [
+        {
+          rel: "icon",
+          type: "image/png",
+          href: "sithsLogo.png",
+        },
+      ],
     },
   },
   runtimeConfig: {

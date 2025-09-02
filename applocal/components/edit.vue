@@ -1,50 +1,88 @@
 <template>
   <form
     @submit.prevent="handleSubmit"
-    class="bg-zinc-900 p-8 flex flex-col rounded-xl bg-black/30 backdrop-blur border border-gold w-[90%] max-w-lg space-y-4"
+    class="bg-white p-8 flex flex-col rounded-3xl shadow-lg border border-gold w-[90%] max-w-lg gap-6"
   >
     <div
-      class="border-b border-gold p-2 flex items-center w-full justify-between"
+      class="border-b border-gold pb-4 flex items-center w-full justify-between"
     >
-      <h2 class="text-xl font-bold">Edit Link</h2>
-      <button @click="emit('cancel')" class="flex items-center px-4 py-2">
+      <h2 class="text-3xl font-bold text-gray-800">Edit Link</h2>
+      <button
+        @click="emit('cancel')"
+        class="flex items-center px-4 py-2 rounded-lg transition-colors duration-200"
+      >
         <span
-          class="absolute w-6 h-1 bg-white rounded-sm rotate-45 origin-center"
+          class="absolute w-6 h-1 bg-gray-600 rounded-sm rotate-45 origin-center"
         ></span>
         <span
-          class="absolute w-6 h-1 bg-white rounded-sm -rotate-45 origin-center"
+          class="absolute w-6 h-1 bg-gray-600 rounded-sm -rotate-45 origin-center"
         ></span>
       </button>
     </div>
-    <Input v-model="form.title" inputType="text" placeholder="Title" />
-    <Input v-model="form.url" inputType="text" placeholder="URL" />
-    <input
-      type="file"
-      accept="image/*"
-      @change="handleFileSelect"
-      class="w-full p-2 border border-gray-300 bg-white text-gold rounded focus:outline-none focus:ring-1 focus:ring-gold focus:border-gold"
-    />
-    <textarea
-      v-model="form.description"
-      placeholder="Description"
-      name="description"
-      id=""
-    ></textarea>
-    <div class="flex self-end">
+    <div class="flex flex-col gap-2">
+      <label for="editTitleInput" class="text-gray-700 font-semibold text-sm">
+        Title *
+      </label>
+      <Input
+        id="editTitleInput"
+        v-model="form.title"
+        input-type="text"
+        placeholder="Enter link title"
+        class="border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold text-black transition-all duration-200"
+        required
+      />
+    </div>
+    <div class="flex flex-col gap-2">
+      <label for="editUrlInput" class="text-gray-700 font-semibold text-sm">
+        URL
+      </label>
+      <Input
+        id="editUrlInput"
+        v-model="form.url"
+        input-type="text"
+        placeholder="https://example.com"
+        class="border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold text-black transition-all duration-200"
+      />
+    </div>
+    <div class="flex flex-col gap-2">
+      <label for="editFileInput" class="text-gray-700 font-semibold text-sm">
+        Upload New Image
+      </label>
+      <input
+        id="editFileInput"
+        type="file"
+        accept="image/*"
+        @change="handleFileSelect"
+        class="p-3 border border-gray-300 bg-white text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gold file:text-black hover:file:bg-yellow-500"
+      />
+    </div>
+    <div class="flex flex-col gap-2">
+      <label
+        for="editDescriptionInput"
+        class="text-gray-700 font-semibold text-sm"
+      >
+        Description
+      </label>
+      <textarea
+        id="editDescriptionInput"
+        v-model="form.description"
+        placeholder="Enter a brief description"
+        rows="4"
+        class="p-3 border border-gray-300 bg-white text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold transition-all duration-200 resize-vertical"
+      ></textarea>
+    </div>
+    <div class="flex justify-center pt-4">
       <button
         type="submit"
-        class="bg-gold text-black px-4 py-2 rounded font-bold"
+        class="bg-gold text-black px-8 py-3 rounded-full font-bold hover:bg-yellow-500 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-2xl"
       >
-        Save
+        Save Changes
       </button>
     </div>
   </form>
 </template>
 
 <script setup lang="ts">
-import type { Form } from "~/utils/interfaces";
-import { ref } from "vue";
-
 const emit = defineEmits<{
   (e: "edit", form: Form & { imageFile?: File }): void;
   (e: "cancel"): void;
@@ -55,6 +93,8 @@ const props = defineProps<{
 
 const selectedFile = ref<File | null>(null);
 
+const originalForm = ref(JSON.stringify(props.form));
+
 function handleFileSelect(event: Event) {
   const target = event.target as HTMLInputElement;
   if (target.files && target.files[0]) {
@@ -63,11 +103,15 @@ function handleFileSelect(event: Event) {
 }
 
 function handleSubmit() {
-  const formData = {
-    ...props.form,
-    imageFile: selectedFile.value || undefined,
-  };
-  emit("edit", formData);
+  if (JSON.stringify(props.form) !== originalForm.value) {
+    const formData = {
+      ...props.form,
+      imageFile: selectedFile.value || undefined,
+    };
+    emit("edit", formData);
+  } else {
+    alert("No Changes Detected");
+  }
 }
 </script>
 

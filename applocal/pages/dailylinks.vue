@@ -1,19 +1,16 @@
 <template>
-  <div class="flex-1 bg-black text-gold p-8 justify-center items-center">
-    <h1 class="text-4xl font-bold mb-6 border-b border-gold pb-2">
-      Daily Links
+  <div class="flex-1 bg-black text-gold p-6 justify-center items-center">
+    <h1
+      class="text-4xl text-center w-full font-bold mb-6 border-b border-gold pb-2"
+    >
+      Daily Announcements
     </h1>
 
     <div v-if="error" class="text-center text-red-500">
       Error loading links: {{ error }}
     </div>
 
-    <section
-      v-else
-      v-for="(group, index) in groupedLinks"
-      :key="index"
-      class="mb-10 w-full border-2 border-black"
-    >
+    <section v-else v-for="(group, index) in groupedLinks" :key="index">
       <div
         v-if="group.links.length > 0"
         class="mb-10 w-full border-2 border-black"
@@ -36,6 +33,10 @@
 </template>
 
 <script setup lang="ts">
+useHead({
+  title: "Daily Announcements",
+});
+
 const error = ref<any>(null);
 
 const response = await useFetch("/api/dailylinks", { server: true });
@@ -47,20 +48,20 @@ const groupedLinks = computed(() => {
 
   if (!links || links.length === 0) {
     return [
-      { title: "Today's Links", links: [] },
-      { title: "Earlier Links", links: [] },
+      { title: "Today's Announcements", links: [] },
+      { title: "Earlier Announcements", links: [] },
     ];
   }
 
   return [
     {
-      title: "Today's Links",
+      title: "Today's Announcements",
       links: links.filter(
         (link: any) => new Date(link.date).toLocaleDateString() === todayString
       ),
     },
     {
-      title: "Earlier Links",
+      title: "Earlier Announcements",
       links: links.filter(
         (link: any) => new Date(link.date).toLocaleDateString() !== todayString
       ),

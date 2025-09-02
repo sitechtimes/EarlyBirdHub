@@ -169,6 +169,12 @@ export function useDailyLinks() {
         }
       }
 
+      // If no image provided or upload failed, default to sithsLogo.png
+      if (!imageUrl) {
+        imageUrl = "/sithsLogo.png";
+        console.log("Using default sithsLogo.png for link creation");
+      }
+
       // Use provided date or current date
       const currentDate = payload.date || getCurrentDate();
 
@@ -350,19 +356,23 @@ export function useDailyLinks() {
 
         if (deleteError) throw deleteError;
       } else if (action.action_type === "delete" && action.old_id) {
-        const { error: deleteOriginalError } = await $supabase
-          .from("daily_links")
-          .delete()
-          .eq("id", action.old_id);
+        if (confirm("Delete Link? This action cannot be undone")) {
+          const { error: deleteOriginalError } = await $supabase
+            .from("daily_links")
+            .delete()
+            .eq("id", action.old_id);
 
-        if (deleteOriginalError) throw deleteOriginalError;
+          if (deleteOriginalError) throw deleteOriginalError;
 
-        const { error: deleteRequestError } = await $supabase
-          .from("daily_links")
-          .delete()
-          .eq("id", actionId);
+          const { error: deleteRequestError } = await $supabase
+            .from("daily_links")
+            .delete()
+            .eq("id", actionId);
 
-        if (deleteRequestError) throw deleteRequestError;
+          if (deleteRequestError) throw deleteRequestError;
+        } else {
+          throw console.error("Deletion not approved");
+        }
       }
 
       await fetchStaffLinks();
@@ -467,6 +477,12 @@ export function useDailyLinks() {
         if (!imageUrl) {
           console.log("No image URL returned, creating link without image");
         }
+      }
+
+      // If no image provided or upload failed, default to sithsLogo.png
+      if (!imageUrl) {
+        imageUrl = "/sithsLogo.png";
+        console.log("Using default sithsLogo.png for direct link creation");
       }
 
       // Use current date

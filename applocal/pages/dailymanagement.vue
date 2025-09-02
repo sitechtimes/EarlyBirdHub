@@ -45,7 +45,7 @@
       </div>
 
       <!-- Show pending links in Pending tab -->
-      <div v-if="createNew == false" class="space-y-6">
+      <div v-if="createNew == false" class="space-y-6 w-full">
         <h2 class="text-xl font-bold text-center">Pending Approval</h2>
         <div
           v-if="pendingActions.length > 0"
@@ -74,7 +74,6 @@
 </template>
 
 <script setup lang="ts">
-import { useDailyLinks } from "~/composables/useDailyLinks";
 import {
   ref,
   watch,
@@ -83,11 +82,14 @@ import {
   nextTick,
   computed,
 } from "vue";
-import type { Form } from "~/utils/interfaces";
 
 // Add middleware to protect this page
 definePageMeta({
   middleware: ["auth"],
+});
+
+useHead({
+  title: "Staff Dashboard",
 });
 
 // Composables
@@ -107,8 +109,6 @@ const authStore = useAuthStore();
 const loggedIn = computed(() => authStore.user !== null);
 
 // State
-const error = ref("");
-const success = ref("");
 const email = ref("");
 const password = ref("");
 const editing = ref(false);
@@ -142,16 +142,10 @@ function updateUnderline() {
   }
 }
 
-function clearMessages() {
-  error.value = "";
-  success.value = "";
-}
-
 async function addLink(formData: any) {
   if (isProcessing.value) return;
 
   isProcessing.value = true;
-  clearMessages();
 
   try {
     await createLink({
@@ -161,7 +155,7 @@ async function addLink(formData: any) {
       image: formData.imageFile || undefined, // Use undefined if no file selected
     });
 
-    success.value = "Link submitted for review";
+    alert("Link submitted for review");
 
     // Reset form
     form.value = {
@@ -174,7 +168,7 @@ async function addLink(formData: any) {
     // Refresh data to show updated lists
     await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
   } catch (err: any) {
-    error.value = err.message || "Failed to create link";
+    alert(err.message || "Failed to create link");
   } finally {
     isProcessing.value = false;
   }
@@ -184,7 +178,7 @@ async function deleteLink(id: number | string) {
   if (confirm("Submit this link for deletion? It will need admin approval.")) {
     try {
       await submitDeleteRequest(String(id));
-      success.value = "Delete request submitted for approval";
+      alert("Delete request submitted for approval");
 
       // Refresh the data
       if (createNew.value) {
@@ -193,7 +187,7 @@ async function deleteLink(id: number | string) {
         await fetchPendingActions();
       }
     } catch (err: any) {
-      error.value = err.message || "Failed to submit delete request";
+      alert(err.message || "Failed to submit delete request");
     }
   }
 }
@@ -223,7 +217,6 @@ async function updateLink(formData: any) {
   if (isUploading.value || !formData.id) return;
 
   isUploading.value = true;
-  clearMessages();
 
   try {
     await submitEditRequest(String(formData.id), {
@@ -232,7 +225,7 @@ async function updateLink(formData: any) {
       url: formData.url,
       image: formData.imageFile || formData.image || "", // Use file if available, otherwise existing image
     });
-    success.value = "Edit request submitted for approval";
+    alert("Edit request submitted for approval");
     editing.value = false;
 
     // Reset form
@@ -250,7 +243,7 @@ async function updateLink(formData: any) {
       await fetchPendingActions();
     }
   } catch (err: any) {
-    error.value = err.message || "Failed to submit edit request";
+    alert(err.message || "Failed to submit edit request");
   } finally {
     isUploading.value = false;
   }
@@ -259,10 +252,10 @@ async function updateLink(formData: any) {
 async function approveLink(id: number | string) {
   try {
     await approveAction(String(id));
-    success.value = "Link approved successfully";
+    alert("Link approved successfully");
     await fetchPendingActions();
   } catch (err: any) {
-    error.value = err.message || "Failed to approve link";
+    alert(err.message || "Failed to approve link");
   }
 }
 
@@ -270,10 +263,10 @@ async function rejectLink(id: number | string) {
   if (confirm("Are you sure you want to reject this link?")) {
     try {
       await rejectAction(String(id));
-      success.value = "Link rejected successfully";
+      alert("Link rejected successfully");
       await fetchPendingActions();
     } catch (err: any) {
-      error.value = err.message || "Failed to reject link";
+      alert(err.message || "Failed to reject link");
     }
   }
 }

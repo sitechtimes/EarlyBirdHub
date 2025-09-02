@@ -1,76 +1,129 @@
 <template>
-  <div class="w-full h-full flex flex-col items-center">
-    <!-- Dropdown -->
-    <div class="w-full flex justify-center relative mt-5">
-      <button
-        @click="open = !open"
-        class="w-1/2 flex justify-between items-center bg-white border border-gray-200 rounded-xl px-4 py-2 text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+  <div
+    class="admin-page w-full h-full flex flex-col items-center min-h-screen bg-black text-gold p-3 pt-10 md:pt-0"
+  >
+    <div class="w-full flex flex-col items-center mb-8">
+      <div
+        class="relative flex justify-center w-full gap-2 sm:gap-4 md:gap-8 mb-6 overflow-x-auto"
       >
-        {{ selected || "Pending" }}
-        <i
-          class="fa-solid fa-caret-up text-gold transition-transform"
-          :class="{ 'rotate-180': open }"
-        ></i>
-      </button>
-      <transition name="fade">
-        <div
-          v-if="open"
-          class="absolute top-full mt-2 w-1/2 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50"
+        <h1
+          @click="selectTab('Pending')"
+          ref="pendingTab"
+          class="text-lg sm:text-xl md:text-2xl font-bold cursor-pointer pb-2 pt-3 px-2 sm: transition-colors duration-200 whitespace-nowrap"
+          :class="{
+            'text-gold': selected === 'Pending',
+            'text-gray-400': selected !== 'Pending',
+          }"
         >
-          <div
-            v-for="(option, index) in options"
-            :key="index"
-            @click="selectOption(option)"
-            :class="[
-              'px-4 py-2 cursor-pointer select-none font-medium',
-              option.disabled
-                ? 'text-gray-400 cursor-not-allowed'
-                : 'hover:bg-gray-100 text-gray-700 font-medium',
-            ]"
-          >
-            {{ option.label }}
-          </div>
-        </div>
-      </transition>
+          Pending
+        </h1>
+        <h1
+          @click="selectTab('Approved')"
+          ref="approvedTab"
+          class="text-lg sm:text-xl md:text-2xl font-bold cursor-pointer pb-2 pt-3 px-2 sm: transition-colors duration-200 whitespace-nowrap"
+          :class="{
+            'text-gold': selected === 'Approved',
+            'text-gray-400': selected !== 'Approved',
+          }"
+        >
+          Approved
+        </h1>
+        <h1
+          @click="selectTab('Create')"
+          ref="createTab"
+          class="text-lg sm:text-xl md:text-2xl font-bold cursor-pointer pb-2 pt-3 px-2 sm: transition-colors duration-200 whitespace-nowrap"
+          :class="{
+            'text-gold': selected === 'Create',
+            'text-gray-400': selected !== 'Create',
+          }"
+        >
+          Create
+        </h1>
+        <h1
+          @click="selectTab('Update')"
+          ref="updateTab"
+          class="text-lg sm:text-xl md:text-2xl font-bold cursor-pointer pb-2 pt-3 px-2 sm: transition-colors duration-200 whitespace-nowrap"
+          :class="{
+            'text-gold': selected === 'Update',
+            'text-gray-400': selected !== 'Update',
+          }"
+        >
+          Update
+        </h1>
+        <div
+          class="absolute bottom-0 h-[3px] bg-gold rounded transition-all duration-300 ease-in-out"
+          :style="{ left: underlineLeft + 'px', width: underlineWidth + 'px' }"
+        ></div>
+      </div>
     </div>
-    <button
-      @click="updateStatic"
-      v-if="selected === 'Update'"
-      class="p-2 bg-white rounded-lg text-gold w-1/2 mt-5"
-    >
-      Update Website
-    </button>
+    <div v-if="selected === 'Update'" class="w-full flex justify-center mb-8">
+      <button @click="updateStatic" class="admin-button">Update Website</button>
+    </div>
 
-    <!-- Create Form -->
-    <div v-if="selected === 'Create'" class="w-full max-w-2xl mt-8">
+    <div v-if="selected === 'Create'" class="w-full flex flex-col items-center">
       <DailyForm :form="createForm" @submit="handleCreateLink" />
     </div>
 
-    <!-- Cards -->
-    <div v-if="selected !== 'Create'" class="p-16">
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        <div v-for="link in links" :key="link.id" class="min-w-[300px]">
-          <CardTemplate
-            :link="link"
-            :card_status="page"
-            :admin="true"
-            @approve="handleApprove"
-            @reject="handleReject"
-            @edit="editLink"
-            @delete="handleDelete"
-          />
-        </div>
-      </div>
-    </div>
+    <div
+      v-if="selected === 'Pending' || selected === 'Approved'"
+      class="w-full"
+    >
+      <h2
+        v-if="selected === 'Pending'"
+        class="text-2xl font-bold text-center mb-6 text-gold"
+      >
+        Pending Actions
+      </h2>
+      <h2
+        v-if="selected === 'Approved'"
+        class="text-2xl font-bold text-center mb-6 text-gold"
+      >
+        Approved Links
+      </h2>
 
-    <!-- Create Form Messages -->
-    <div v-if="selected === 'Create'" class="w-full max-w-2xl px-4">
-      <!-- Error and Success Messages for Create Form -->
-      <div v-if="error" class="bg-red-600 text-white p-4 rounded-lg mb-4">
-        {{ error }}
+      <div
+        v-if="links.length > 0"
+        class="gap-6 mb-12 px-4"
+        :class="
+          selected === 'Pending'
+            ? 'grid grid-cols-1 xl:grid-cols-2 gap-8'
+            : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 auto-rows-fr'
+        "
+      >
+        <CardTemplate
+          v-for="link in links"
+          :key="link.id"
+          :link="link"
+          :card_status="page"
+          :admin="true"
+          :original-link="
+            page === 'Pending' ? getOriginalLink(link) : undefined
+          "
+          @approve="handleApprove"
+          @reject="handleReject"
+          @edit="editLink"
+          @delete="handleDelete"
+        />
       </div>
-      <div v-if="success" class="bg-green-600 text-white p-4 rounded-lg mb-4">
-        {{ success }}
+
+      <div v-else class="text-center text-gray-400 py-16">
+        <div class="max-w-md mx-auto">
+          <i class="fa-solid fa-inbox text-6xl mb-4 opacity-50"></i>
+          <p class="text-2xl font-semibold mb-2">
+            {{
+              selected === "Pending"
+                ? "No pending actions"
+                : "No approved links found"
+            }}
+          </p>
+          <p class="text-base opacity-75">
+            {{
+              selected === "Pending"
+                ? "All clear! No items are waiting for approval."
+                : "Start creating content to see it here."
+            }}
+          </p>
+        </div>
       </div>
     </div>
     <div
@@ -83,10 +136,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-
 definePageMeta({
   middleware: ["auth", "admin"],
+});
+
+useHead({
+  title: "Admin Dashboard",
 });
 
 const {
@@ -107,9 +162,9 @@ const authStore = useAuthStore();
 type Status = "Pending" | "Approved" | "Create" | "Update";
 const form = ref({
   id: null as string | null,
-  name: "",
+  title: "",
   url: "",
-  img: "",
+  image: "",
   description: "",
   date: "",
 });
@@ -123,18 +178,16 @@ const createForm = ref({
 
 const editing = ref(false);
 const page = ref<Status>("Pending");
-const open = ref(false);
-const selected = ref<string | null>("Pending");
-const error = ref("");
-const success = ref("");
+const selected = ref<string>("Pending");
 const isProcessing = ref(false);
 
-const options = [
-  { label: "Pending", disabled: false },
-  { label: "Approved", disabled: false },
-  { label: "Create", disabled: false },
-  { label: "Update", disabled: false },
-];
+// Tab refs for underline animation
+const pendingTab = ref<HTMLElement | null>(null);
+const approvedTab = ref<HTMLElement | null>(null);
+const createTab = ref<HTMLElement | null>(null);
+const updateTab = ref<HTMLElement | null>(null);
+const underlineLeft = ref(0);
+const underlineWidth = ref(0);
 
 const links = computed(() => {
   switch (page.value) {
@@ -147,22 +200,30 @@ const links = computed(() => {
   }
 });
 
+// get the original link for a pending action
+const getOriginalLink = (pendingAction: any) => {
+  if (!pendingAction.old_id) return null;
+
+  // Look for the original link in the staffLinks
+  return (
+    staffLinks.value.find((link) => link.id === pendingAction.old_id) || null
+  );
+};
+
 async function handleApprove(actionId: number) {
   if (isProcessing.value) return;
 
   isProcessing.value = true;
-  error.value = "";
-  success.value = "";
 
   try {
     await approveAction(String(actionId));
-    success.value = "Action approved successfully";
+    alert("Action approved successfully");
 
     setTimeout(async () => {
       await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
     }, 500);
   } catch (err) {
-    error.value = "Failed to approve action";
+    alert("Failed to approve action");
     console.error("Approve error:", err);
   } finally {
     isProcessing.value = false;
@@ -170,51 +231,57 @@ async function handleApprove(actionId: number) {
 }
 
 async function handleReject(actionId: number) {
-  if (isProcessing.value) return;
+  if (confirm("Reject Link? This action cannot be undone.")) {
+    if (isProcessing.value) return;
 
-  isProcessing.value = true;
-  error.value = "";
-  success.value = "";
+    isProcessing.value = true;
 
-  try {
-    await rejectAction(String(actionId));
-    success.value = "Action rejected successfully";
+    try {
+      await rejectAction(String(actionId));
+      alert("Action rejected successfully");
 
-    setTimeout(async () => {
-      await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
-    }, 500);
-  } catch (err) {
-    error.value = "Failed to reject action";
-    console.error("Reject error:", err);
-  } finally {
-    isProcessing.value = false;
+      setTimeout(async () => {
+        await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
+      }, 500);
+    } catch (err) {
+      alert("Failed to reject action");
+      console.error("Reject error:", err);
+    } finally {
+      isProcessing.value = false;
+    }
   }
 }
 
 function editLink(link: any) {
-  form.value = { ...link };
+  form.value = {
+    id: link.id,
+    title: link.name || link.title || "",
+    url: link.url || "",
+    image: link.img || link.image || "",
+    description: link.description || "",
+    date: link.date || "",
+  };
   editing.value = true;
 }
 
 async function handleDelete(id: number | string) {
-  if (isProcessing.value) return;
+  if (confirm("Delete Link? This action cannot be undone.")) {
+    if (isProcessing.value) return;
 
-  isProcessing.value = true;
-  error.value = "";
-  success.value = "";
+    isProcessing.value = true;
+    try {
+      await deleteLinkDirect(String(id));
+      alert("Link deleted successfully");
 
-  try {
-    await deleteLinkDirect(String(id));
-    success.value = "Link deleted successfully";
-
-    setTimeout(async () => {
-      await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
-    }, 500);
-  } catch (err) {
-    error.value = "Failed to delete link";
-    console.error("Delete error:", err);
-  } finally {
-    isProcessing.value = false;
+      setTimeout(async () => {
+        await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
+      }, 500);
+    } catch (err) {
+      alert("Failed to delete link");
+      console.error("Delete error:", err);
+    } finally {
+      isProcessing.value = false;
+    }
   }
 }
 
@@ -222,24 +289,22 @@ async function updateLink(formData: any) {
   if (isProcessing.value || !formData.id) return;
 
   isProcessing.value = true;
-  error.value = "";
-  success.value = "";
 
   try {
     await updateLinkDirect(String(formData.id), {
-      name: formData.name,
+      name: formData.title || formData.name,
       description: formData.description,
       url: formData.url,
-      image: formData.imageFile || formData.img || "",
+      image: formData.imageFile || formData.image || formData.img || "",
     });
-    success.value = "Link updated successfully";
+    alert("Link updated successfully");
     cancelEdit();
 
     setTimeout(async () => {
       await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
     }, 500);
   } catch (err) {
-    error.value = "Failed to update link";
+    alert("Failed to update link");
     console.error("Update error:", err);
   } finally {
     isProcessing.value = false;
@@ -250,8 +315,6 @@ async function handleCreateLink(formData: any) {
   if (isProcessing.value) return;
 
   isProcessing.value = true;
-  error.value = "";
-  success.value = "";
 
   try {
     await createLinkDirect({
@@ -260,7 +323,7 @@ async function handleCreateLink(formData: any) {
       url: formData.url,
       image: formData.imageFile || undefined,
     });
-    success.value = "Link created successfully";
+    alert("Link created successfully");
 
     // Reset create form
     createForm.value = {
@@ -275,7 +338,7 @@ async function handleCreateLink(formData: any) {
       await Promise.all([fetchStaffLinks(), fetchPendingActions()]);
     }, 500);
   } catch (err) {
-    error.value = "Failed to create link";
+    alert("Failed to create link");
     console.error("Create error:", err);
   } finally {
     isProcessing.value = false;
@@ -290,33 +353,53 @@ function cancelEdit() {
 function resetForm() {
   form.value = {
     id: null,
-    name: "",
+    title: "",
     url: "",
-    img: "",
+    image: "",
     description: "",
     date: "",
   };
 }
 
-function selectOption(option: { label: string; disabled?: boolean }) {
-  if (!option.disabled) {
-    selected.value = option.label;
-    page.value = option.label as Status;
-    open.value = false;
+function selectTab(tabName: Status) {
+  selected.value = tabName;
+  page.value = tabName;
 
-    switch (option.label) {
-      case "Pending":
-        fetchPendingActions();
-        break;
-      case "Approved":
-        fetchStaffLinks();
-        break;
-      case "Create":
-        // Clear any error/success messages when switching to create
-        error.value = "";
-        success.value = "";
-        break;
-    }
+  updateUnderline();
+
+  switch (tabName) {
+    case "Pending":
+      Promise.all([fetchPendingActions(), fetchStaffLinks()]);
+      break;
+    case "Approved":
+      fetchStaffLinks();
+      break;
+    case "Create":
+      break;
+  }
+}
+
+function updateUnderline() {
+  let activeTab: HTMLElement | null = null;
+
+  switch (selected.value) {
+    case "Pending":
+      activeTab = pendingTab.value;
+      break;
+    case "Approved":
+      activeTab = approvedTab.value;
+      break;
+    case "Create":
+      activeTab = createTab.value;
+      break;
+    case "Update":
+      activeTab = updateTab.value;
+      break;
+  }
+
+  if (activeTab) {
+    underlineLeft.value = activeTab.offsetLeft;
+    underlineWidth.value = activeTab.offsetWidth;
   }
 }
 
@@ -328,10 +411,31 @@ onMounted(async () => {
   try {
     await authStore.fetchUser();
     authStore.listenToAuthChanges();
-    await fetchPendingActions(); // Default view
+
+    // Load both pending actions and staff links for the before/after comparison
+    await Promise.all([fetchPendingActions(), fetchStaffLinks()]);
+
+    // Initialize underline position after DOM is ready
+    await nextTick();
+    updateUnderline();
+
+    // Add resize listener for responsive underline
+    window.addEventListener("resize", updateUnderline);
   } catch (error) {
     console.error("Failed to initialize admin page:", error);
   }
+});
+
+onBeforeUnmount(() => {
+  // Clean up resize listener
+  window.removeEventListener("resize", updateUnderline);
+});
+
+// Watch for changes in selected tab to update underline
+watch(selected, () => {
+  nextTick(() => {
+    updateUnderline();
+  });
 });
 </script>
 

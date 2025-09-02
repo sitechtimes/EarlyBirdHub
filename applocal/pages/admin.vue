@@ -46,6 +46,7 @@
           :class="{
             'text-gold': selected === 'Update',
             'text-gray-400': selected !== 'Update',
+            disabled: authStore.updatingSite,
           }"
         >
           Update

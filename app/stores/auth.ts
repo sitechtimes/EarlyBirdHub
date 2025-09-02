@@ -7,6 +7,8 @@ export const useAuthStore = defineStore("auth", () => {
   const isAdmin = computed(() => user.value?.email === "admin@siths.com");
   const isStaff = computed(() => user.value?.email === "staff@siths.com");
 
+  const updatingSite = ref(false);
+
   const fetchUser = async () => {
     const { $supabase } = useNuxtApp();
     const { data } = await $supabase.auth.getUser();
@@ -21,7 +23,7 @@ export const useAuthStore = defineStore("auth", () => {
     });
     if (error) throw error;
     user.value = data.user;
-    console.log("User signed in:", user.value);
+    //console.log("User signed in:", user.value);
   };
 
   const signOut = async () => {
@@ -41,6 +43,7 @@ export const useAuthStore = defineStore("auth", () => {
     user,
     isAdmin,
     isStaff,
+    updatingSite,
     fetchUser,
     signIn,
     signOut,

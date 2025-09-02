@@ -159,7 +159,7 @@
             <h3
               class="flex w-fit items-center text-xl font-semibold backdrop-blur-md bg-black/50 text-white px-3 py-2 rounded-xl"
             >
-              {{ deletion ? true : link.name }}
+              {{ deletion ? "DELETED" : link.name }}
             </h3>
             <div class="flex-grow"></div>
             <div class="space-y-2">
@@ -263,7 +263,7 @@
       <h3
         class="flex w-fit items-center text-xl font-semibold backdrop-blur-md bg-black/50 text-white px-3 py-2 rounded-xl"
       >
-        {{ deletion ? true : link.name }}
+        {{ deletion ? "DELETED" : link.name }}
       </h3>
       <div class="flex-grow"></div>
       <div class="space-y-2">
@@ -385,7 +385,6 @@ const props = defineProps<{
 const deletion = ref(props.link.action_type === "delete");
 
 const closeAllCards = () => {
-  console.log("closeAllCards called"); // Debug log
   linkOpened.value = false;
   pendingLinkAfterOpened.value = false;
   pendingLinkBeforeOpened.value = false;
@@ -422,8 +421,5 @@ const emit = defineEmits<{
 <style>
 .no-scroll {
   overflow: hidden !important;
-  height: 100% !important;
-  position: fixed !important;
-  width: 100% !important;
 }
 </style>

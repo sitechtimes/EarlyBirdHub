@@ -33,7 +33,7 @@
         required
       />
       <div class="text-xs text-gray-500 text-right">
-        {{ (form.title || '').length }}/45 characters
+        {{ (form.title || "").length }}/45 characters
       </div>
     </div>
     <div class="flex flex-col gap-2">
@@ -76,7 +76,7 @@
         class="p-3 border border-gray-300 bg-white text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold transition-all duration-200 resize-vertical"
       ></textarea>
       <div class="text-xs text-gray-500 text-right">
-        {{ (form.description || '').length }}/150 characters
+        {{ (form.description || "").length }}/150 characters
       </div>
     </div>
     <div class="flex justify-center pt-4">
@@ -111,7 +111,7 @@ function handleFileSelect(event: Event) {
 }
 
 function handleSubmit() {
-  if ((props.form.title ?? '').length > 35) {
+  if ((props.form.title ?? "").length > 35) {
     alert("Title is too long (max 35 characters)");
     return;
   }

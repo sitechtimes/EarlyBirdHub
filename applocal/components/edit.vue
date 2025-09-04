@@ -28,9 +28,13 @@
         v-model="form.title"
         input-type="text"
         placeholder="Enter link title"
+        :maxlength="45"
         class="border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold text-black transition-all duration-200"
         required
       />
+      <div class="text-xs text-gray-500 text-right">
+        {{ (form.title || '').length }}/45 characters
+      </div>
     </div>
     <div class="flex flex-col gap-2">
       <label for="editUrlInput" class="text-gray-700 font-semibold text-sm">
@@ -68,8 +72,12 @@
         v-model="form.description"
         placeholder="Enter a brief description"
         rows="4"
+        maxlength="150"
         class="p-3 border border-gray-300 bg-white text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold transition-all duration-200 resize-vertical"
       ></textarea>
+      <div class="text-xs text-gray-500 text-right">
+        {{ (form.description || '').length }}/150 characters
+      </div>
     </div>
     <div class="flex justify-center pt-4">
       <button
@@ -103,6 +111,10 @@ function handleFileSelect(event: Event) {
 }
 
 function handleSubmit() {
+  if ((props.form.title ?? '').length > 35) {
+    alert("Title is too long (max 35 characters)");
+    return;
+  }
   if (JSON.stringify(props.form) !== originalForm.value) {
     const formData = {
       ...props.form,

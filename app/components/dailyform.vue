@@ -15,8 +15,12 @@
         v-model="localForm.title"
         input-type="text"
         placeholder="Enter link title"
+        :maxlength="45"
         required
       />
+      <div class="text-xs text-gray-500 text-right">
+        {{ (localForm.title || '').length }}/45 characters
+      </div>
     </div>
 
     <div class="w-4/5 flex flex-col gap-2">
@@ -55,8 +59,12 @@
         v-model="localForm.description"
         placeholder="Enter a brief description"
         rows="4"
+        maxlength="150"
         class="p-3 border border-gray-300 bg-white text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold transition-all duration-200 resize-vertical"
       ></textarea>
+      <div class="text-xs text-gray-500 text-right">
+        {{ (localForm.description || '').length }}/150 characters
+      </div>
     </div>
 
     <button type="submit" class="admin-button">Add Link</button>
@@ -64,6 +72,7 @@
 </template>
 
 <script setup lang="ts">
+
 const props = defineProps<{
   form: Form;
 }>();
@@ -78,6 +87,11 @@ const selectedFile = ref<File | null>(null);
 
 const fileInput = useTemplateRef<HTMLInputElement | null>("fileInput");
 
+// Watch for prop changes and update local form
+watch(() => props.form, (newForm) => {
+  localForm.value = { ...newForm };
+}, { deep: true, immediate: true });
+
 function handleFileSelect(event: Event) {
   const target = event.target as HTMLInputElement;
   if (target.files && target.files[0]) {
@@ -86,6 +100,14 @@ function handleFileSelect(event: Event) {
 }
 
 function handleSubmit() {
+  if ((localForm.value.title ?? '').length > 35) {
+    alert("Title is too long (max 35 characters)");
+    return;
+  }
+  if ((localForm.value.description ?? '').length > 150) {
+    alert("Description is too long");
+    return;
+  }
   const formData = {
     ...localForm.value,
     imageFile: selectedFile.value || undefined,

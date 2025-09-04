@@ -33,6 +33,7 @@ function checkAuth(req, res, next) {
 
 function runBuild(res) {
   const appPath = path.join(__dirname, "..");
+  console.log('updating');
   exec(
     "npm run copy-local-images && npm run generate && npx netlify deploy --prod --dir=.output/public",
     { cwd: appPath },

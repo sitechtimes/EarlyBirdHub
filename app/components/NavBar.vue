@@ -100,11 +100,11 @@ watch(
 
 <style scoped>
 .navbar {
-  animation: navbar-slide-in 0.3s ease-out;
+  animation: navbar-slide-in 0.3s ease-in-out;
 }
 
 .navbar-slide-out {
-  animation: navbar-slide-out 0.3s ease-out forwards;
+  animation: navbar-slide-out 0.3s ease-in-out forwards;
 }
 
 @keyframes navbar-slide-in {

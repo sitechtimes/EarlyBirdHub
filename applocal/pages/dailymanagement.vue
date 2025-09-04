@@ -24,7 +24,7 @@
       <DailyForm v-if="createNew == true" :form="form" @submit="addLink" />
 
       <!-- Show current daily links in Manage tab -->
-      <div v-if="createNew == true" class="space-y-6 mt-8">
+      <div v-if="createNew == true" class="space-y-6 mt-8 mb-8">
         <h2 class="text-xl font-bold text-center">Your Current Daily Links</h2>
         <div
           v-if="staffLinks.length > 0"

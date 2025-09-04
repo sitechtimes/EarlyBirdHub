@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-1 bg-black text-gold p-6 justify-center items-center">
+  <div class="flex-1 bg-black text-gold p-6 md:pr-20 md:pl-20 justify-center items-center">
     <h1
       class="text-4xl text-center w-full font-bold mb-6 border-b border-gold pb-2"
     >
@@ -18,7 +18,7 @@
         <h2 class="text-2xl font-semibold mb-4">
           {{ group.title }}
         </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-7">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-7">
           <CardTemplate
             v-if="group.links.length > 0"
             v-for="link in group.links"
@@ -48,14 +48,14 @@ const groupedLinks = computed(() => {
 
   if (!links || links.length === 0) {
     return [
-      { title: "Today's Announcements", links: [] },
+      { title: "Recent Announcements", links: [] },
       { title: "Earlier Announcements", links: [] },
     ];
   }
 
   return [
     {
-      title: "Today's Announcements",
+      title: "Recent Announcements",
       links: links.filter(
         (link: any) => new Date(link.date).toLocaleDateString() === todayString
       ),

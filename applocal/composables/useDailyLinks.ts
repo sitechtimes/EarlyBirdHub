@@ -610,7 +610,7 @@ export function useDailyLinks() {
         alert("Build Complete!");
       } catch (e) {
         console.error(e);
-        alert("Build failed");
+        //alert("Build failed");
       }
       authStore.updatingSite = false;
     }

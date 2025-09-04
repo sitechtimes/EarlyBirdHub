@@ -1,6 +1,6 @@
 <template>
   <div
-    class="admin-page w-full h-full flex flex-col items-center min-h-screen bg-black text-gold p-3 pt-10 md:pt-0"
+    class="admin-page w-full h-full flex flex-col items-center min-h-screen bg-black text-gold p-3 md:pl-20 md:pr-20 pt-10 md:pt-0"
   >
     <div class="w-full flex flex-col items-center mb-8">
       <div

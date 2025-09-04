@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const SOURCE_DIR =
-  "C:\\Users\\bbern\\OneDrive\\Documents\\GitHub\\EarlyBirdHubBackend\\supabase\\docker\\volumes\\storage\\stub\\stub\\daily-links-images";
+  "C:\\Users\\bbern\\OneDrive\\Desktop\\Coding Stuff\\supabase\\docker\\volumes\\storage\\stub\\stub\\daily-links-images";
 const OUTPUT_DIR = path.join(__dirname, "..", "public", "daily-links-images");
 
 async function copyImagesFromLocal() {

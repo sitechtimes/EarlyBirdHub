@@ -212,7 +212,7 @@
       </div>
 
       <!-- Content Section -->
-      <div class="p-4 flex-1 flex flex-col min-h-0">
+      <div class="flex-1 p-4 flex flex-col min-h-0">
         <!-- Title as clickable URL -->
         <h3
           class="text-xl font-bold text-black mb-2"

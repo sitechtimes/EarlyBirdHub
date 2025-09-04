@@ -195,11 +195,11 @@
     <!-- Regular Cards (Non-Pending so Approved) -->
     <div
       v-else
-      class="approved-card p-1 flex flex-col bg-white rounded-3xl overflow-hidden shadow-lg max-w-sm mx-auto w-full h-96"
+      class="approved-card flex flex-col bg-white rounded-3xl overflow-hidden shadow-lg max-w-sm mx-auto w-full h-96"
     >
       <!-- Image Section -->
       <div
-        class="h-48 bg-cover bg-center relative flex-shrink-0 md:hover:h-4/5 transition-all md:duration-300 shadow-md border-2 border-black rounded-3xl"
+        class="h-48 bg-cover bg-center relative flex-shrink-0 md:hover:h-4/5 transition-all md:duration-300 shadow-md border-b-2 border-black"
         :style="{
           backgroundImage: link.img
             ? `url(${link.img})`
@@ -207,12 +207,12 @@
         }"
       >
         <div
-          class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-3xl"
+          class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"
         ></div>
       </div>
 
       <!-- Content Section -->
-      <div class="flex-1 p-3 flex flex-col min-h-0">
+      <div class="flex-1 p-4 flex flex-col min-h-0">
         <!-- Title as clickable URL -->
         <h3
           class="text-xl font-bold text-black mb-2"

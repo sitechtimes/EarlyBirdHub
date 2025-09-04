@@ -40,7 +40,7 @@ export default defineNuxtConfig({
         {
           rel: "icon",
           type: "image/png",
-          href: "sithsLogo.png",
+          href: "/sithsLogo.png",
         },
       ],
     },

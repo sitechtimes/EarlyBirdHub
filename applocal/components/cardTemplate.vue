@@ -15,28 +15,37 @@
           >
             BEFORE
           </div>
-          <div class="flex flex-col bg-white rounded-3xl overflow-hidden shadow-lg h-96">
+          <div
+            class="flex flex-col bg-white rounded-3xl overflow-hidden shadow-lg h-96"
+          >
             <!-- Image Section -->
-            <div 
+            <div
               class="h-48 bg-cover bg-center relative flex-shrink-0 md:hover:h-4/5 transition-all md:duration-300 shadow-md border-b-2 border-black"
               :style="{
-                backgroundImage: originalLink?.img ? `url(${originalLink?.img})` : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                backgroundImage: originalLink?.img
+                  ? `url(${originalLink?.img})`
+                  : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               }"
             >
-              <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"
+              ></div>
             </div>
-            
+
             <!-- Content Section -->
             <div class="p-3 flex-1 flex flex-col min-h-0">
               <!-- Title as clickable URL -->
-              <h3 class="text-lg font-bold text-black mb-2" :class="{'underline ': originalLink?.url}">
+              <h3
+                class="text-lg font-bold text-black mb-2"
+                :class="{ 'underline ': originalLink?.url }"
+              >
                 <a
                   v-if="originalLink?.url"
                   :href="originalLink?.url"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="hover:underline text-blue-600"
-                  :class="{'hover:text-gold': originalLink?.url}"
+                  :class="{ 'hover:text-gold': originalLink?.url }"
                   @click.stop
                 >
                   {{ originalLink?.name }}
@@ -45,26 +54,34 @@
                   {{ originalLink?.name }}
                 </span>
               </h3>
-              
+
               <!-- Description -->
-              <div class="mb-2 overflow-y-auto" v-if="originalLink?.description">
-                <p 
+              <div
+                class="mb-2 overflow-y-auto"
+                v-if="originalLink?.description"
+              >
+                <p
                   class="text-gray-600 text-sm md:line-clamp-full"
                   :class="originalBeforeExpanded ? '' : 'line-clamp-2'"
                 >
                   {{ originalLink?.description }}
                 </p>
                 <button
-                  v-if="originalLink?.description && originalLink.description.length > 100"
+                  v-if="
+                    originalLink?.description &&
+                    originalLink.description.length > 100
+                  "
                   @click.stop="originalBeforeExpanded = !originalBeforeExpanded"
                   class="text-blue-600 hover:text-blue-800 text-xs mt-1"
                 >
-                  {{ originalBeforeExpanded ? 'Read less' : 'Read more' }}
+                  {{ originalBeforeExpanded ? "Read less" : "Read more" }}
                 </button>
               </div>
-              
+
               <!-- Date -->
-              <div class="flex items-center justify-between mt-auto flex-shrink-0">
+              <div
+                class="flex items-center justify-between mt-auto flex-shrink-0"
+              >
                 <span class="text-xs text-gray-500" v-if="originalLink?.date">
                   {{ originalLink?.date }}
                 </span>
@@ -80,21 +97,31 @@
           >
             AFTER
           </div>
-          <div class="flex flex-col bg-white rounded-3xl overflow-hidden shadow-lg h-96"
-               :class="deletion ? 'opacity-50' : ''">
+          <div
+            class="flex flex-col bg-white rounded-3xl overflow-hidden shadow-lg h-96"
+            :class="deletion ? 'opacity-50' : ''"
+          >
             <!-- Image Section -->
-            <div 
+            <div
               class="h-48 bg-cover bg-center relative flex-shrink-0 md:hover:h-4/5 transition-all md:duration-300 shadow-md border-b-2 border-black"
               :style="{
-                backgroundImage: link.img && !deletion ? `url(${link.img})` : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                backgroundImage:
+                  link.img && !deletion
+                    ? `url(${link.img})`
+                    : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               }"
             >
-              <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-              <div v-if="deletion" class="absolute inset-0 bg-red-500/50 flex items-center justify-center">
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"
+              ></div>
+              <div
+                v-if="deletion"
+                class="absolute inset-0 bg-red-500/50 flex items-center justify-center"
+              >
                 <span class="text-white font-bold text-lg">DELETED</span>
               </div>
             </div>
-            
+
             <!-- Content Section -->
             <div class="p-3 flex-1 flex flex-col min-h-0">
               <!-- Title as clickable URL -->
@@ -105,8 +132,7 @@
                   target="_blank"
                   rel="noopener noreferrer"
                   class="hover:underline text-blue-600"
-                  :class="{'hover:text-gold': link.url}"
-
+                  :class="{ 'hover:text-gold': link.url }"
                   @click.stop
                 >
                   {{ link.name }}
@@ -115,10 +141,13 @@
                   {{ deletion ? "DELETED" : link.name }}
                 </span>
               </h3>
-              
+
               <!-- Description -->
-              <div class="mb-2 overflow-y-auto" v-if="link.description && !deletion">
-                <p 
+              <div
+                class="mb-2 overflow-y-auto"
+                v-if="link.description && !deletion"
+              >
+                <p
                   class="text-gray-600 text-sm"
                   :class="pendingAfterExpanded ? '' : 'line-clamp-2'"
                 >
@@ -129,12 +158,14 @@
                   @click.stop="pendingAfterExpanded = !pendingAfterExpanded"
                   class="text-blue-600 hover:text-blue-800 text-xs mt-1"
                 >
-                  {{ pendingAfterExpanded ? 'Read less' : 'Read more' }}
+                  {{ pendingAfterExpanded ? "Read less" : "Read more" }}
                 </button>
               </div>
-              
+
               <!-- Date -->
-              <div class="flex items-center justify-between mt-auto flex-shrink-0">
+              <div
+                class="flex items-center justify-between mt-auto flex-shrink-0"
+              >
                 <span class="text-xs text-gray-500" v-if="link.date">
                   {{ link.date }}
                 </span>
@@ -164,29 +195,36 @@
     <!-- Regular Cards (Non-Pending so Approved) -->
     <div
       v-else
-      class="approved-card flex flex-col bg-white rounded-3xl overflow-hidden shadow-lg max-w-sm mx-auto w-full h-96"
+      class="approved-card p-1 flex flex-col bg-white rounded-3xl overflow-hidden shadow-lg max-w-sm mx-auto w-full h-96"
     >
       <!-- Image Section -->
-      <div 
-        class="h-48 bg-cover bg-center relative flex-shrink-0 md:hover:h-4/5 transition-all md:duration-300 shadow-md border-b-2 border-black"
+      <div
+        class="h-48 bg-cover bg-center relative flex-shrink-0 md:hover:h-4/5 transition-all md:duration-300 shadow-md border-2 border-black rounded-3xl"
         :style="{
-          backgroundImage: link.img ? `url(${link.img})` : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+          backgroundImage: link.img
+            ? `url(${link.img})`
+            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         }"
       >
-        <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-3xl"
+        ></div>
       </div>
-      
+
       <!-- Content Section -->
-      <div class="p-4 flex-1 flex flex-col min-h-0">
+      <div class="flex-1 p-3 flex flex-col min-h-0">
         <!-- Title as clickable URL -->
-        <h3 class="text-xl font-bold text-black mb-2" :class="{'underline': link.url}">
+        <h3
+          class="text-xl font-bold text-black mb-2"
+          :class="{ underline: link.url }"
+        >
           <a
             v-if="link.url"
             :href="link.url"
             target="_blank"
             rel="noopener noreferrer"
             class="hover:underline text-blue-600"
-            :class="{'hover:text-gold': link.url && !deletion}"
+            :class="{ 'hover:text-gold': link.url && !deletion }"
             @click.stop
           >
             {{ deletion ? "DELETED" : link.name }}
@@ -195,10 +233,10 @@
             {{ deletion ? "DELETED" : link.name }}
           </span>
         </h3>
-        
+
         <!-- Description -->
         <div class="flex-1 mb-3 overflow-y-auto" v-if="link.description">
-          <p 
+          <p
             class="text-gray-600 text-sm"
             :class="approvedExpanded ? '' : 'line-clamp-2'"
           >
@@ -209,16 +247,16 @@
             @click.stop="approvedExpanded = !approvedExpanded"
             class="text-blue-600 hover:text-blue-800 text-xs mt-1"
           >
-            {{ approvedExpanded ? 'Read less' : 'Read more' }}
+            {{ approvedExpanded ? "Read less" : "Read more" }}
           </button>
         </div>
-        
+
         <!-- Date and Actions -->
         <div class="flex items-center justify-between mt-auto flex-shrink-0">
           <span class="text-xs text-gray-500" v-if="link.date">
             {{ link.date }}
           </span>
-          
+
           <!-- Admin Actions -->
           <div class="flex gap-2" v-if="admin">
             <button
@@ -234,7 +272,7 @@
               Delete
             </button>
           </div>
-          
+
           <!-- Non-admin pending status -->
           <span
             v-if="card_status === 'Pending' && !admin"

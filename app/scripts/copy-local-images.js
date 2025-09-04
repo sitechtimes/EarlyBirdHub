@@ -7,8 +7,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const SOURCE_DIR =
-  "C:\\Users\\bbern\\OneDrive\\Desktop\\Coding Stuff\\supabase\\docker\\volumes\\storage\\stub\\stub\\daily-links-images";
-const OUTPUT_DIR = path.join(__dirname, "..", "public", "daily-links-images");
+  "C:\\Users\\bbern\\OneDrive\\Documents\\GitHub\\EarlyBirdHubBackend\\supabase\\docker\\volumes\\storage\\stub\\stub\\daily-links-images\\daily-links";
+const OUTPUT_DIR = path.join(
+  __dirname,
+  "..",
+  "public",
+  "daily-links-images",
+  "daily-links"
+);
 
 async function copyImagesFromLocal() {
   try {
@@ -47,6 +53,12 @@ async function copyDirectory(source, destination) {
   await fs.mkdir(destination, { recursive: true });
 
   for (const entry of entries) {
+    // Skip system files and non-image directories
+    if (entry.name.startsWith(".") || entry.name === "node_modules") {
+      console.log(`⏭️  Skipped: ${entry.name} (system file)`);
+      continue;
+    }
+
     const sourcePath = path.join(source, entry.name);
     const destinationPath = path.join(destination, entry.name);
 
@@ -72,8 +84,8 @@ async function copyDirectory(source, destination) {
           console.warn(`⚠️  Failed to copy ${entry.name}:`, error.message);
         }
       } else {
-        // Regular directory, recurse into it
-        fileCount += await copyDirectory(sourcePath, destinationPath);
+        // Skip directories that don't contain files (avoid infinite recursion)
+        console.log(`⏭️  Skipped: ${entry.name} (no files found)`);
       }
     } else {
       try {

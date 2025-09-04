@@ -39,7 +39,7 @@ export default defineNuxtConfig({
         {
           rel: "icon",
           type: "image/png",
-          href: "sithsLogo.png",
+          href: "/sithsLogo.png",
         },
       ],
     },
@@ -58,6 +58,9 @@ export default defineNuxtConfig({
     storesDirs: ["./stores/**"],
   },
   nitro: {
+    prerender: {
+      failOnError: false,
+    },
     publicAssets: [
       {
         baseURL: "/.well-known",

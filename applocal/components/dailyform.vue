@@ -19,7 +19,7 @@
         required
       />
       <div class="text-xs text-gray-500 text-right">
-        {{ (localForm.title || '').length }}/45 characters
+        {{ (localForm.title || "").length }}/45 characters
       </div>
     </div>
 
@@ -63,7 +63,7 @@
         class="p-3 border border-gray-300 bg-white text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold transition-all duration-200 resize-vertical"
       ></textarea>
       <div class="text-xs text-gray-500 text-right">
-        {{ (localForm.description || '').length }}/150 characters
+        {{ (localForm.description || "").length }}/150 characters
       </div>
     </div>
 
@@ -72,7 +72,6 @@
 </template>
 
 <script setup lang="ts">
-
 const props = defineProps<{
   form: Form;
 }>();
@@ -88,9 +87,13 @@ const selectedFile = ref<File | null>(null);
 const fileInput = useTemplateRef<HTMLInputElement | null>("fileInput");
 
 // Watch for prop changes and update local form
-watch(() => props.form, (newForm) => {
-  localForm.value = { ...newForm };
-}, { deep: true, immediate: true });
+watch(
+  () => props.form,
+  (newForm) => {
+    localForm.value = { ...newForm };
+  },
+  { deep: true, immediate: true }
+);
 
 function handleFileSelect(event: Event) {
   const target = event.target as HTMLInputElement;
@@ -100,11 +103,11 @@ function handleFileSelect(event: Event) {
 }
 
 function handleSubmit() {
-  if ((localForm.value.title ?? '').length > 35) {
-    alert("Title is too long (max 35 characters)");
+  if ((localForm.value.title ?? "").length > 45) {
+    alert("Title is too long (max 45 characters)");
     return;
   }
-  if ((localForm.value.description ?? '').length > 150) {
+  if ((localForm.value.description ?? "").length > 150) {
     alert("Description is too long");
     return;
   }

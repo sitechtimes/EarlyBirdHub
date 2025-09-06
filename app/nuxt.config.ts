@@ -78,6 +78,8 @@ export default defineNuxtConfig({
     // Prevent Vue Router from handling static asset paths
     "/daily-links-images/**": { prerender: false },
     "/_nuxt/**": { prerender: false },
+    // Prevent Vue Router from handling Netlify functions
+    "/.netlify/functions/**": { prerender: false },
   },
   // Suppress Vue Router warnings for image paths
   vue: {

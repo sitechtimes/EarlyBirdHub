@@ -9,6 +9,7 @@
     "prebuild": "node scripts/prebuild.js",
     "download-images": "node scripts/download-images.js",
     "copy-local-images": "node scripts/copy-local-images.js",
+    "setup-images": "node scripts/setup-images.js",
     "scan-images": "node scripts/scan-needed-images.js",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"

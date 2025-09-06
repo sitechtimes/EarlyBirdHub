@@ -1,12 +1,3 @@
-interface DailyLink {
-  img?: string;
-  image?: string;
-  imageUrl?: string;
-  image_url?: string;
-  thumbnail?: string;
-  [key: string]: unknown;
-}
-
 /**
  * Transform relative image paths back to Supabase URLs for local development
  * Example:
@@ -18,7 +9,7 @@ export function transformImageUrl(
   supabaseUrl?: string,
   forceTransform = false
 ): string | null {
-  if (!url) {
+  if (!url || typeof url !== "string") {
     return null;
   }
 
@@ -50,10 +41,10 @@ export function transformImageUrl(
  * Transform all image URLs in a daily link object
  */
 export function transformDailyLinkImages(
-  link: DailyLink,
+  link: any,
   supabaseUrl?: string,
   forceTransform = true
-): DailyLink {
+): any {
   if (!link) return link;
 
   const transformedLink = { ...link };
@@ -62,9 +53,9 @@ export function transformDailyLinkImages(
   const imageFields = ["img", "image", "imageUrl", "image_url", "thumbnail"];
 
   imageFields.forEach((field) => {
-    if (transformedLink[field] && typeof transformedLink[field] === "string") {
+    if (transformedLink[field]) {
       transformedLink[field] = transformImageUrl(
-        transformedLink[field] as string,
+        transformedLink[field],
         supabaseUrl,
         forceTransform
       );
@@ -86,10 +77,10 @@ export function transformDailyLinkImages(
  * Transform all image URLs in an array of daily links
  */
 export function transformDailyLinksArray(
-  links: DailyLink[],
+  links: any[],
   supabaseUrl?: string,
   forceTransform = true
-): DailyLink[] {
+): any[] {
   if (!Array.isArray(links)) return [];
 
   return links.map((link) =>

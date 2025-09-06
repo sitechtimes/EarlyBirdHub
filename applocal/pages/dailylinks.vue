@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="flex-1 bg-black text-gold p-6 md:pr-20 md:pl-20 justify-center items-center"
-  >
+  <div class="flex-1 bg-black text-gold p-6 md:pr-20 md:pl-20 justify-center items-center">
     <h1
       class="text-4xl text-center w-full font-bold mb-6 border-b border-gold pb-2"
     >
@@ -13,14 +11,16 @@
     </div>
 
     <section v-else v-for="(group, index) in groupedLinks" :key="index">
-      <div v-if="group.links.length" class="mb-10 w-full border-2 border-black">
+      <div
+        v-if="group.links.length > 0"
+        class="mb-10 w-full border-2 border-black"
+      >
         <h2 class="text-2xl font-semibold mb-4">
           {{ group.title }}
         </h2>
-        <div
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-7"
-        >
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-7">
           <CardTemplate
+            v-if="group.links.length > 0"
             v-for="link in group.links"
             :card_status="'Approved'"
             :admin="false"
@@ -37,27 +37,33 @@ useHead({
   title: "Daily Announcements",
 });
 
-const error = ref<string | null>(null);
+const error = ref<any>(null);
 
 const response = await useFetch("/api/dailylinks", { server: true });
-const userLinks = response.data.value ?? [];
+const userLinks = response.data.value ?? []; // unwrap the ref by .value
 
 const groupedLinks = computed(() => {
+  const links = userLinks || [];
   const todayString = new Date().toLocaleDateString();
+
+  if (!links || links.length === 0) {
+    return [
+      { title: "Recent Announcements", links: [] },
+      { title: "Earlier Announcements", links: [] },
+    ];
+  }
 
   return [
     {
       title: "Recent Announcements",
-      links: userLinks.filter(
-        (link: DailyLink) =>
-          new Date(link.date).toLocaleDateString() === todayString
+      links: links.filter(
+        (link: any) => new Date(link.date).toLocaleDateString() === todayString
       ),
     },
     {
       title: "Earlier Announcements",
-      links: userLinks.filter(
-        (link: DailyLink) =>
-          new Date(link.date).toLocaleDateString() !== todayString
+      links: links.filter(
+        (link: any) => new Date(link.date).toLocaleDateString() !== todayString
       ),
     },
   ];

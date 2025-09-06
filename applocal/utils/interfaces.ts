@@ -1,12 +1,11 @@
 export interface DailyLink {
   id: number;
   title: string;
-  old_id?: string;
-  action_type: string;
   url?: string;
-  img?: string;
+  image?: string;
   description?: string;
-  date: string;
+  date_end: string;
+  date_uploaded: string;
 }
 
 export interface User {

@@ -63,7 +63,14 @@
             <div
               class="bg-black bg-opacity-60 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-opacity-80 transition-all duration-200 pointer-events-auto"
             >
-              <img src="/play-button.svg" alt="Play" class="w-8 h-8" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-8 h-8 text-white"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <polygon points="8,5 19,12 8,19" />
+              </svg>
             </div>
           </div>
         </a>
@@ -75,11 +82,16 @@
             rel="noopener noreferrer"
             class="button md:py-2 md:px-4 md:rounded-md flex flex-1 items-center justify-center flex-col text-center font-semibold md:text-xl text-xs border-2 border-gold text-white py-1 px-2 rounded transition-all duration-500 relative"
           >
-            <img
-              src="/announcement.svg"
-              alt="Announcement"
-              class="w-10 h-1/2"
-            />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-10 h-1/2 text-gold"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M21 7.5V16.5C21 17.3284 20.3284 18 19.5 18C18.6716 18 18 17.3284 18 16.5V15H7.5C6.11929 15 5 13.8807 5 12.5V11.5C5 10.1193 6.11929 9 7.5 9H18V7.5C18 6.67157 18.6716 6 19.5 6C20.3284 6 21 6.67157 21 7.5ZM3 12C3 13.6569 4.34315 15 6 15V9C4.34315 9 3 10.3431 3 12ZM9 17C9 17.5523 9.44772 18 10 18C10.5523 18 11 17.5523 11 17V15H9V17Z"
+              />
+            </svg>
             <span class="h-1/2 justify-center flex items-center"
               >Submit an Announcement</span
             >
@@ -90,7 +102,43 @@
             target="_blank"
             rel="noopener noreferrer"
           >
-            <img src="/sports.svg" alt="Sports" class="w-10 h-10" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-10 h-10 text-gold"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                cx="12"
+                cy="14"
+                r="5"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"
+              />
+              <path
+                d="M7 4l5 7 5-7"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"
+              />
+              <rect
+                x="6"
+                y="2"
+                width="3"
+                height="4"
+                rx="1"
+                fill="currentColor"
+              />
+              <rect
+                x="15"
+                y="2"
+                width="3"
+                height="4"
+                rx="1"
+                fill="currentColor"
+              />
+            </svg>
             <span class="h-1/2 justify-center flex items-center"
               >Submit a Sports Announcement</span
             >
@@ -99,11 +147,26 @@
             to="/dailylinks"
             class="button md:py-2 md:px-4 md:rounded-md flex flex-1 items-center justify-between flex-col text-center font-semibold md:text-xl text-xs border-2 border-gold text-white py-1 px-2 rounded transition-all duration-500 relative"
           >
-            <img
-              src="/rocket.svg"
-              alt="Daily Announcements"
-              class="w-10 h-1/2"
-            />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-10 h-1/2 text-gold"
+              fill="currentColor"
+              viewBox="0 0 28 28"
+            >
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g
+                id="SVGRepo_tracerCarrier"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke="#CCCCCC"
+                stroke-width="0.064"
+              ></g>
+              <g id="SVGRepo_iconCarrier">
+                <path
+                  d="M 20.53125 2.5625 L 19.84375 3.5 L 14.9375 10.1875 C 12.308594 9.730469 9.527344 10.472656 7.5 12.5 L 6.78125 13.1875 L 12.09375 18.5 L 4 26.59375 L 4 28 L 5.40625 28 L 13.5 19.90625 L 18.8125 25.21875 L 19.5 24.5 C 21.527344 22.472656 22.269531 19.691406 21.8125 17.0625 L 28.5 12.15625 L 29.4375 11.46875 Z M 20.78125 5.625 L 26.375 11.21875 L 20.15625 15.78125 L 19.59375 16.1875 L 19.78125 16.84375 C 20.261719 18.675781 19.738281 20.585938 18.59375 22.1875 L 9.8125 13.40625 C 11.414063 12.261719 13.324219 11.738281 15.15625 12.21875 L 15.8125 12.40625 L 16.21875 11.84375 Z"
+                ></path>
+              </g>
+            </svg>
 
             <span class="h-1/2 justify-center flex items-center"
               >Daily Announcements</span

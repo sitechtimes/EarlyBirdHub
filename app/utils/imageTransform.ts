@@ -1,44 +1,53 @@
-interface DailyLink {
-  img?: string;
-  image?: string;
-  imageUrl?: string;
-  image_url?: string;
-  thumbnail?: string;
-  [key: string]: unknown;
-}
-
 /**
- * Transform relative image paths back to Supabase URLs for local development
+ * Transform Supabase image URLs to relative paths for static builds
  * Example:
- * From: /daily-links-images/daily-links/image.png
- * To: http://192.168.1.152:8000/storage/v1/object/public/daily-links-images/daily-links/image.png
+ * From: http://your-supabase-url/storage/v1/object/public/daily-links-images/daily-links/image.png
+ * To: /daily-links-images/daily-links/image.png
  */
 export function transformImageUrl(
   url: string | null | undefined,
   supabaseUrl?: string,
   forceTransform = false
 ): string | null {
-  if (!url) {
+  if (!url || typeof url !== "string") {
     return null;
   }
 
-  // If it's already a full Supabase URL, return as-is
-  if (url.startsWith("http") && url.includes("/storage/v1/object/public/")) {
+  // If it's already a relative path, return as-is
+  if (url.startsWith("/")) {
     return url;
   }
 
-  // Transform relative paths to Supabase URLs for local development
-  // This ensures we always use the live Supabase instance
+  // Always transform Supabase URLs to use public routes
+  // This ensures consistent behavior in all environments
 
-  // Check if it's a relative path to daily-links-images
-  if (url.startsWith("/daily-links-images/")) {
-    if (supabaseUrl) {
-      // Convert relative path to full Supabase URL
-      const cleanUrl = supabaseUrl.endsWith("/")
-        ? supabaseUrl.slice(0, -1)
-        : supabaseUrl;
-      const cleanPath = url.startsWith("/") ? url.slice(1) : url;
-      return `${cleanUrl}/storage/v1/object/public/${cleanPath}`;
+  // Check if it's a Supabase storage URL
+  if (url.includes("/storage/v1/object/public/")) {
+    // If supabaseUrl is provided, also check if the URL starts with it
+    if (supabaseUrl && !url.startsWith(supabaseUrl)) {
+      return url; // Not from our Supabase instance
+    }
+
+    try {
+      const urlObj = new URL(url);
+      const pathParts = urlObj.pathname.split("/");
+
+      // Find the bucket name (daily-links-images) in the path
+      const bucketIndex = pathParts.findIndex(
+        (part) => part === "daily-links-images"
+      );
+
+      if (bucketIndex !== -1) {
+        // Extract everything from bucket name onwards
+        const relativePath = pathParts.slice(bucketIndex).join("/");
+        // Ensure no trailing slash for image files
+        const cleanPath = relativePath.endsWith("/")
+          ? relativePath.slice(0, -1)
+          : relativePath;
+        return `/${cleanPath}`;
+      }
+    } catch (error) {
+      console.warn("Failed to parse image URL:", url, error);
     }
   }
 
@@ -50,10 +59,10 @@ export function transformImageUrl(
  * Transform all image URLs in a daily link object
  */
 export function transformDailyLinkImages(
-  link: DailyLink,
+  link: any,
   supabaseUrl?: string,
   forceTransform = true
-): DailyLink {
+): any {
   if (!link) return link;
 
   const transformedLink = { ...link };
@@ -62,9 +71,9 @@ export function transformDailyLinkImages(
   const imageFields = ["img", "image", "imageUrl", "image_url", "thumbnail"];
 
   imageFields.forEach((field) => {
-    if (transformedLink[field] && typeof transformedLink[field] === "string") {
+    if (transformedLink[field]) {
       transformedLink[field] = transformImageUrl(
-        transformedLink[field] as string,
+        transformedLink[field],
         supabaseUrl,
         forceTransform
       );
@@ -86,10 +95,10 @@ export function transformDailyLinkImages(
  * Transform all image URLs in an array of daily links
  */
 export function transformDailyLinksArray(
-  links: DailyLink[],
+  links: any[],
   supabaseUrl?: string,
   forceTransform = true
-): DailyLink[] {
+): any[] {
   if (!Array.isArray(links)) return [];
 
   return links.map((link) =>

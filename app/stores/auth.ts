@@ -1,7 +1,8 @@
-import type { User } from "@supabase/supabase-js";
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
 
 export const useAuthStore = defineStore("auth", () => {
-  const user = ref<User | null>(null);
+  const user = ref<any>(null);
 
   const isAdmin = computed(() => user.value?.email === "admin@siths.com");
   const isStaff = computed(() => user.value?.email === "staff@siths.com");

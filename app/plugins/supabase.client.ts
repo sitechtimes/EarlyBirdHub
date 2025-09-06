@@ -1,5 +1,5 @@
 import { defineNuxtPlugin } from "#app";
-import { createClient, type User } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 import { ref } from "vue";
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -12,7 +12,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   );
 
-  const user = ref<User | null>(null);
+  const user = ref<any>(null);
 
   supabase.auth.getSession().then(({ data }) => {
     user.value = data.session?.user ?? null;

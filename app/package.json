@@ -8,6 +8,8 @@
     "generate": "npm run prebuild && nuxt generate",
     "prebuild": "node scripts/prebuild.js",
     "copy-local-images": "node scripts/copy-local-images.js",
+    "download-images": "node scripts/download-images.js",
+    "setup-images": "node scripts/setup-images.js",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },

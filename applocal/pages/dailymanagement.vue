@@ -74,16 +74,6 @@
 </template>
 
 <script setup lang="ts">
-import {
-  ref,
-  watch,
-  onMounted,
-  onBeforeUnmount,
-  nextTick,
-  computed,
-} from "vue";
-
-// Add middleware to protect this page
 definePageMeta({
   middleware: ["auth"],
 });

@@ -107,14 +107,4 @@ function redirectBasedOnRole() {
     navigateTo("/");
   }
 }
-
-// Watch for authentication state changes
-watch(
-  () => authStore.user,
-  (newUser) => {
-    if (newUser) {
-      redirectBasedOnRole();
-    }
-  }
-);
 </script>

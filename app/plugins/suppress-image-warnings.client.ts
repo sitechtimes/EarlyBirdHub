@@ -11,7 +11,9 @@ export default defineNuxtPlugin(() => {
         message.includes(
           "[Vue Router warn]: No match found for location with path"
         ) &&
-        message.includes("/daily-links-images/")
+        (message.includes("/daily-links-images/") ||
+          message.includes(".svg") ||
+          message.includes("/&/"))
       ) {
         return; // Don't log these specific warnings
       }

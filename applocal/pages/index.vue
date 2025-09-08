@@ -138,6 +138,10 @@ interface YouTubePlaylistResponse {
   items: YouTubePlaylistItem[];
 }
 
+useHead({
+  title: "EarlyBirdHub",
+});
+
 const {
   data: playlist,
   pending,

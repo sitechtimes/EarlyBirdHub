@@ -86,7 +86,7 @@
               class="button md:py-2 md:px-4 md:rounded-md flex flex-1 items-center justify-center flex-col text-center font-semibold md:text-xl text-xs border-2 border-gold text-white py-1 px-2 rounded transition-all duration-500 relative"
             >
               <img
-                src="/announcement.svg"
+                src="/announcement.png"
                 alt="Announcement"
                 class="w-10 h-1/2"
               />

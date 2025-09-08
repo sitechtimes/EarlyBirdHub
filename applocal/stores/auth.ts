@@ -3,8 +3,8 @@ import type { User } from "@supabase/supabase-js";
 export const useAuthStore = defineStore("auth", () => {
   const user = ref<User | null>(null);
 
-  const isAdmin = computed(() => user.value?.email === "admin@siths.com");
-  const isStaff = computed(() => user.value?.email === "staff@siths.com");
+  const isAdmin = computed(() => user.value?.email === "mvanburen@schools.nyc.gov");
+  const isStaff = computed(() => user.value?.email === "earlybird@siths.com");
 
   const updatingSite = ref(false);
 

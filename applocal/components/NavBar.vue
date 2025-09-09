@@ -15,7 +15,9 @@
       </NuxtLink>
 
       <a
-        href="#"
+        href="https://docs.google.com/forms/d/e/1FAIpQLScmrCVAQOp43sSwGC6xbDLxQOch1aryVliJ3CCSFn9Nc00cjQ/viewform"
+        target="_blank"
+        rel="noopener noreferrer"
         class="px-2 flex items-center hover:bg-gray-700 transition p-2 rounded-lg gap-2"
       >
         <i class="fa-solid fa-microphone"></i>

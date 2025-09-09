@@ -11,7 +11,7 @@ export const useAuthStore = defineStore("auth", () => {
   const isStaff = computed(
     () =>
       user.value?.email === "earlybird@siths.com" ||
-      user.value?.email === "st aff@siths.com"
+      user.value?.email === "staff@siths.com"
   );
 
   const updatingSite = ref(false);

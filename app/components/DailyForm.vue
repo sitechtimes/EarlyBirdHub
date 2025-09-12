@@ -103,8 +103,8 @@ function handleFileSelect(event: Event) {
 }
 
 function handleSubmit() {
-  if ((localForm.value.title ?? "").length > 35) {
-    alert("Title is too long (max 35 characters)");
+  if ((localForm.value.title ?? "").length > 45) {
+    alert("Title is too long (max 45 characters)");
     return;
   }
   if ((localForm.value.description ?? "").length > 150) {

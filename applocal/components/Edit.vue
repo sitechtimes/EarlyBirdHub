@@ -111,8 +111,8 @@ function handleFileSelect(event: Event) {
 }
 
 function handleSubmit() {
-  if ((props.form.title ?? "").length > 35) {
-    alert("Title is too long (max 35 characters)");
+  if ((props.form.title ?? "").length > 45) {
+    alert("Title is too long (max 45 characters)");
     return;
   }
   if (JSON.stringify(props.form) !== originalForm.value) {

@@ -115,7 +115,7 @@ function handleSubmit() {
     alert("Title is too long (max 45 characters)");
     return;
   }
-  if (JSON.stringify(props.form) !== originalForm.value) {
+  if ((JSON.stringify(props.form) !== originalForm.value) || selectedFile.value) {
     const formData = {
       ...props.form,
       imageFile: selectedFile.value || undefined,

@@ -61,21 +61,10 @@
                 v-if="originalLink?.description"
               >
                 <p
-                  class="text-gray-600 text-sm md:line-clamp-full"
-                  :class="originalBeforeExpanded ? '' : 'line-clamp-2'"
+                  class="text-gray-600 text-sm"
                 >
                   {{ originalLink?.description }}
                 </p>
-                <button
-                  v-if="
-                    originalLink?.description &&
-                    originalLink.description.length > 100
-                  "
-                  @click.stop="originalBeforeExpanded = !originalBeforeExpanded"
-                  class="text-blue-600 hover:text-blue-800 text-xs mt-1"
-                >
-                  {{ originalBeforeExpanded ? "Read less" : "Read more" }}
-                </button>
               </div>
 
               <!-- Date -->
@@ -149,17 +138,9 @@
               >
                 <p
                   class="text-gray-600 text-sm"
-                  :class="pendingAfterExpanded ? '' : 'line-clamp-2'"
                 >
                   {{ link.description }}
                 </p>
-                <button
-                  v-if="link.description && link.description.length > 100"
-                  @click.stop="pendingAfterExpanded = !pendingAfterExpanded"
-                  class="text-blue-600 hover:text-blue-800 text-xs mt-1"
-                >
-                  {{ pendingAfterExpanded ? "Read less" : "Read more" }}
-                </button>
               </div>
 
               <!-- Date -->
@@ -238,17 +219,9 @@
         <div class="flex-1 mb-3 overflow-y-auto" v-if="link.description">
           <p
             class="text-gray-600 text-sm"
-            :class="approvedExpanded ? '' : 'line-clamp-2'"
           >
             {{ link.description }}
           </p>
-          <button
-            v-if="link.description && link.description.length > 100"
-            @click.stop="approvedExpanded = !approvedExpanded"
-            class="text-blue-600 hover:text-blue-800 text-xs mt-1"
-          >
-            {{ approvedExpanded ? "Read less" : "Read more" }}
-          </button>
         </div>
 
         <!-- Date and Actions -->
@@ -319,11 +292,6 @@ const props = defineProps<{
 }>();
 
 const deletion = ref(props.link.action_type === "delete");
-
-// Read more states for different card types
-const originalBeforeExpanded = ref(false);
-const pendingAfterExpanded = ref(false);
-const approvedExpanded = ref(false);
 
 const emit = defineEmits<{
   (e: "edit", link: Link): void;

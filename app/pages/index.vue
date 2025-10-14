@@ -190,11 +190,7 @@ const {
     return data;
   },
 });
-if (playlist.value?.items) {
-  playlist.value.items = playlist.value.items
-    .filter(item => item.snippet.title !== "Deleted video")
-    .slice(0, 1);
-}
+
 const getParsedPlaylist = () => {
   if (typeof playlist.value === "string") {
     try {

@@ -148,11 +148,7 @@ const {
   error,
   refresh,
 } = await useFetch<YouTubePlaylistResponse>("/api/playlist");
-if (playlist.value?.items) {
-  playlist.value.items = playlist.value.items
-    .filter(item => item.snippet.title !== "Deleted video")
-    .slice(0, 1);
-}
+
 const useNavBarStore = useNavbarStore();
 const randomY1 = ref(50);
 const randomY2 = ref(50);

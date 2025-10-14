@@ -12,11 +12,15 @@ module.exports.handler = async function () {
     };
   }
 
-  const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=1&key=${apiKey}`;
+  const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=10&key=${apiKey}`;
 
   try {
     const res = await fetch(url);
     const data = await res.json();
+    data.items = data.items.filter(
+      (item) => !(item.snippet && item.snippet.title && item.snippet.title === "Deleted video")
+    );
+    data.items = data.items.length ? [data.items[0]] : [];
 
     // Check for YouTube API errors
     if (data.error) {

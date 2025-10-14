@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const data = await $fetch(
-      `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=PLXdwySAEBRBWocKBDaEE7HCw3rb3EvpeU&maxResults=1&key=${config.apiSecret}`
+      `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=PLXdwySAEBRBWocKBDaEE7HCw3rb3EvpeU&maxResults=10&key=${config.apiSecret}`
     );
 
     return data;

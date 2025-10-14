@@ -174,6 +174,7 @@ const {
   error,
   refresh,
 } = await useFetch<YouTubePlaylistResponse>("/.netlify/functions/playlist", {
+  
   server: false,
   default: () => ({ items: [] }),
   transform: (data: any) => {
@@ -189,8 +190,11 @@ const {
     return data;
   },
 });
-
-// Function to parse playlist if it comes as a string
+if (playlist.value?.items) {
+  playlist.value.items = playlist.value.items
+    .filter(item => item.snippet.title !== "Deleted video")
+    .slice(0, 1);
+}
 const getParsedPlaylist = () => {
   if (typeof playlist.value === "string") {
     try {

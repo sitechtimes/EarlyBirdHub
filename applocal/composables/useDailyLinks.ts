@@ -4,9 +4,9 @@ import { getCurrentDate } from "~/utils/dateUtils";
 export function useDailyLinks() {
   const { $supabase } = useNuxtApp();
   const config = useRuntimeConfig();
-  const staffLinks = ref<Array<any>>([]);
-  const pendingActions = ref<Array<any>>([]);
-  const userLinks = ref<Array<any>>([]);
+  const staffLinks = ref<DailyLink[]>([]);
+  const pendingActions = ref<DailyLink[]>([]);
+  const userLinks = ref<DailyLink[]>([]);
   const authStore = useAuthStore();
 
   const fetchUserLinks = async () => {

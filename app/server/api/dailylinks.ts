@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     return [];
   }
 
-  // Transform image URLs to relative paths only for static builds
-  const forceTransform = true;
+  // Keep full Supabase URLs for cloud storage
+  const forceTransform = false;
   return transformDailyLinksArray(data || [], supabaseUrl, forceTransform);
 });

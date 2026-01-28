@@ -14,8 +14,6 @@ export const useAuthStore = defineStore("auth", () => {
       user.value?.email === "staff@siths.com"
   );
 
-  const updatingSite = ref(false);
-
   const fetchUser = async () => {
     const { $supabase } = useNuxtApp();
     const { data } = await $supabase.auth.getUser();
@@ -50,7 +48,6 @@ export const useAuthStore = defineStore("auth", () => {
     user,
     isAdmin,
     isStaff,
-    updatingSite,
     fetchUser,
     signIn,
     signOut,

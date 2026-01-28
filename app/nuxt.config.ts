@@ -49,9 +49,8 @@ export default defineNuxtConfig({
     public: {
       supabaseUrl: "",
       supabaseAnonKey: "",
-      backendUrl: "",
-      url: "",
-      buildSecret: "",
+      youtubeApiKey: "",
+      youtubePlaylistId: "",
     },
   },
   pinia: {

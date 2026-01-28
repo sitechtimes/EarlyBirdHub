@@ -28,7 +28,7 @@ export function useDailyLinks() {
         throw error;
       }
 
-      const forceTransform = true;
+      const forceTransform = false;
       userLinks.value = transformDailyLinksArray(
         data || [],
         config.public.supabaseUrl,
@@ -54,7 +54,7 @@ export function useDailyLinks() {
         throw error;
       }
 
-      const forceTransform = true;
+      const forceTransform = false;
       staffLinks.value = transformDailyLinksArray(
         data || [],
         config.public.supabaseUrl,
@@ -78,7 +78,7 @@ export function useDailyLinks() {
         throw error;
       }
 
-      const forceTransform = true;
+      const forceTransform = false;
       pendingActions.value = transformDailyLinksArray(
         data || [],
         config.public.supabaseUrl,
@@ -602,20 +602,6 @@ export function useDailyLinks() {
     }
   }
 
-  async function updateSite() {
-    if (confirm("Update Site? This may take up to a few minutes.")) {
-      authStore.updatingSite = true;
-      try {
-        await $fetch("/api/build", { method: "POST" });
-        alert("Build Complete!");
-      } catch (e) {
-        console.error(e);
-        //alert("Build failed");
-      }
-      authStore.updatingSite = false;
-    }
-  }
-
   return {
     staffLinks,
     userLinks,
@@ -631,6 +617,5 @@ export function useDailyLinks() {
     updateLinkDirect,
     createLinkDirect,
     deleteLinkDirect,
-    updateSite,
   };
 }

@@ -1,8 +1,7 @@
 /**
- * Transform Supabase image URLs to relative paths for static builds
- * Example:
- * From: http://your-supabase-url/storage/v1/object/public/daily-links-images/daily-links/image.png
- * To: /daily-links-images/daily-links/image.png
+ * Transform image URLs for Supabase storage
+ * When forceTransform is false: Keep full Supabase URLs or convert relative paths back to full URLs
+ * When forceTransform is true: Convert to relative paths for local static builds
  */
 export function transformImageUrl(
   url: string | null | undefined,
@@ -13,13 +12,41 @@ export function transformImageUrl(
     return null;
   }
 
+  // If forceTransform is false, we want to use full Supabase URLs
+  if (!forceTransform) {
+    // If it's already a full Supabase URL, return as-is
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      return url;
+    }
+
+    // If it's a relative path or just a filename, convert to full Supabase URL
+    if (supabaseUrl) {
+      // Remove leading slash if present
+      const cleanPath = url.startsWith("/") ? url.substring(1) : url;
+
+      // Check if it looks like it's already a storage path (contains daily-links-images)
+      if (cleanPath.includes("daily-links-images")) {
+        return `${supabaseUrl}/storage/v1/object/public/${cleanPath}`;
+      }
+
+      // If it's just a filename, assume it's in the daily-links folder
+      if (!cleanPath.includes("/")) {
+        return `${supabaseUrl}/storage/v1/object/public/daily-links-images/daily-links/${cleanPath}`;
+      }
+
+      // Otherwise, assume it needs the full path
+      return `${supabaseUrl}/storage/v1/object/public/daily-links-images/daily-links/${cleanPath}`;
+    }
+
+    return url;
+  }
+
+  // forceTransform is true - convert to relative paths for local static builds
+
   // If it's already a relative path, return as-is
   if (url.startsWith("/")) {
     return url;
   }
-
-  // Always transform Supabase URLs to use public routes
-  // This ensures consistent behavior in all environments
 
   // Check if it's a Supabase storage URL
   if (url.includes("/storage/v1/object/public/")) {

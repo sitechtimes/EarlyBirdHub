@@ -48,7 +48,7 @@
           class="video-container rounded-lg w-fit"
         >
           <a
-            :href="`https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}`"
+            :href="`https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}&list=${config.public.youtubePlaylistId}`"
             target="_blank"
             rel="noopener noreferrer"
             class="relative block group overflow-hidden"
@@ -168,14 +168,15 @@ useHead({
   title: "EarlyBirdHub",
 });
 
+const config = useRuntimeConfig();
+
 const {
   data: playlist,
   pending,
   error,
   refresh,
-} = await useFetch<YouTubePlaylistResponse>("/.netlify/functions/playlist", {
-  
-  server: false,
+} = await useFetch<YouTubePlaylistResponse>("/api/playlist", {
+  server: true,
   default: () => ({ items: [] }),
   transform: (data: any) => {
     // Ensure the response is parsed as JSON if it's a string

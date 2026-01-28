@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { transformDailyLinksArray } from "~/utils/imageTransform";
 
 const config = useRuntimeConfig();
 const supabaseUrl = config.public.supabaseUrl;
@@ -16,5 +17,7 @@ export default defineEventHandler(async (event) => {
     return [];
   }
 
-  return data;
+  // Keep full Supabase URLs for cloud storage
+  const forceTransform = false;
+  return transformDailyLinksArray(data || [], supabaseUrl, forceTransform);
 });

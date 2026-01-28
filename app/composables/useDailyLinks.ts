@@ -1,10 +1,13 @@
+import { transformDailyLinksArray } from "~/utils/imageTransform";
+import { getCurrentDate } from "~/utils/dateUtils";
+
 export function useDailyLinks() {
   const { $supabase } = useNuxtApp();
   const config = useRuntimeConfig();
-  const staffLinks = ref<Array<any>>([]);
-  const pendingActions = ref<Array<any>>([]);
-  const rejectedActions = ref<Array<any>>([]);
-  const userLinks = ref<Array<any>>([]);
+  const staffLinks = ref<DailyLink[]>([]);
+  const pendingActions = ref<DailyLink[]>([]);
+  const userLinks = ref<DailyLink[]>([]);
+  const authStore = useAuthStore();
 
   const fetchUserLinks = async () => {
     try {
@@ -25,8 +28,13 @@ export function useDailyLinks() {
         throw error;
       }
 
-      userLinks.value = data || [];
-      console.log("User links fetched:", userLinks.value);
+      const forceTransform = false;
+      userLinks.value = transformDailyLinksArray(
+        data || [],
+        config.public.supabaseUrl,
+        forceTransform
+      );
+      //console.log("User links fetched:", userLinks.value);
     } catch (error) {
       console.error("Failed to fetch user links:", error);
       userLinks.value = [];
@@ -46,7 +54,12 @@ export function useDailyLinks() {
         throw error;
       }
 
-      staffLinks.value = data || [];
+      const forceTransform = false;
+      staffLinks.value = transformDailyLinksArray(
+        data || [],
+        config.public.supabaseUrl,
+        forceTransform
+      );
     } catch (error) {
       console.error("Failed to fetch staff links:", error);
     }
@@ -65,57 +78,113 @@ export function useDailyLinks() {
         throw error;
       }
 
-      pendingActions.value = data || [];
+      const forceTransform = false;
+      pendingActions.value = transformDailyLinksArray(
+        data || [],
+        config.public.supabaseUrl,
+        forceTransform
+      );
     } catch (error) {
       console.error("Failed to fetch pending actions:", error);
     }
   };
 
-  const fetchRejectedActions = async () => {
+  // Helper function to delete image from storage
+  async function deleteImageFromStorage(imageUrl: string) {
     try {
-      const { data, error } = await $supabase
-        .from("daily_links")
-        .select("*")
-        .eq("status", "rejected")
-        .order("date", { ascending: false });
-
-      if (error) {
-        console.error("Supabase error:", error);
-        throw error;
+      if (
+        !imageUrl ||
+        imageUrl === "/sithsLogo.png" ||
+        !imageUrl.includes("daily-links-images")
+      ) {
+        // Don't delete default logo or non-storage images
+        return;
       }
 
-      rejectedActions.value = data || [];
+      // Extract the file path from the URL
+      const urlParts = imageUrl.split("/daily-links-images/");
+      if (urlParts.length < 2) {
+        //console.log("Could not extract file path from URL:", imageUrl);
+        return;
+      }
+
+      const filePath = urlParts[1];
+      //console.log("Attempting to delete image:", filePath);
+
+      const { error } = await $supabase.storage
+        .from("daily-links-images")
+        .remove([filePath]);
+
+      if (error) {
+        console.error("Error deleting image from storage:", error);
+      } else {
+        //console.log("Successfully deleted image from storage:", filePath);
+      }
     } catch (error) {
-      console.error("Failed to fetch rejected actions:", error);
+      console.error("Failed to delete image from storage:", error);
     }
-  };
+  }
 
   async function uploadImage(file: File): Promise<string> {
     try {
+      // Check if user is authenticated
+      const {
+        data: { user },
+        error: authError,
+      } = await $supabase.auth.getUser();
+      //console.log("Auth check - User:", user, "Error:", authError);
+
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
       const fileExt = file.name.split(".").pop();
-      const fileName = `${Math.random()}.${fileExt}`;
+      const fileName = `${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(7)}.${fileExt}`;
       const filePath = `daily-links/${fileName}`;
 
+      //console.log("Attempting to upload file:", filePath, "Size:", file.size);
+
+      // Try uploading without upsert first
       const { data, error } = await $supabase.storage
         .from("daily-links-images")
         .upload(filePath, file, {
           cacheControl: "3600",
-          upsert: false,
+          upsert: true, // Changed to true to overwrite if exists
         });
 
       if (error) {
-        console.error("Upload error:", error);
+        console.error("Upload error details:", error);
+
+        // Try alternative approach - upload to a different path or with different options
+        if (
+          error.message.includes("row-level security") ||
+          error.message.includes("policy")
+        ) {
+          //console.log("RLS error, trying without authentication...");
+
+          // Alternative: Return a placeholder or skip image for now
+          console.warn(
+            "Skipping image upload due to RLS policy. Creating link without image."
+          );
+          return ""; // Return empty string to indicate no image
+        }
         throw error;
       }
+
+      //console.log("Upload successful:", data);
 
       const {
         data: { publicUrl },
       } = $supabase.storage.from("daily-links-images").getPublicUrl(filePath);
 
+      //console.log("Generated public URL:", publicUrl);
       return publicUrl;
     } catch (error) {
       console.error("Failed to upload image:", error);
-      throw error;
+      // Instead of throwing, return empty string to allow link creation without image
+      return "";
     }
   }
 
@@ -124,15 +193,27 @@ export function useDailyLinks() {
     description?: string;
     url?: string;
     image?: File | string; // Can be either File object or URL string
-    date: string;
+    date?: string; // Make date optional
   }) {
     try {
       let imageUrl = payload.image;
 
-      // If image is a File object, upload it first
+      // If image is a File object, try to upload it
       if (payload.image instanceof File) {
         imageUrl = await uploadImage(payload.image);
+        if (!imageUrl) {
+          //console.log("No image URL returned, creating link without image");
+        }
       }
+
+      // If no image provided or upload failed, default to sithsLogo.png
+      if (!imageUrl) {
+        imageUrl = "/sithsLogo.png";
+        //console.log("Using default sithsLogo.png for link creation");
+      }
+
+      // Use provided date or current date
+      const currentDate = payload.date || getCurrentDate();
 
       const { data, error } = await $supabase
         .from("daily_links")
@@ -142,7 +223,7 @@ export function useDailyLinks() {
             description: payload.description,
             url: payload.url,
             img: imageUrl,
-            date: payload.date,
+            date: currentDate,
             action_type: "create",
             approved: false,
           },
@@ -170,16 +251,23 @@ export function useDailyLinks() {
       description?: string;
       url?: string;
       image?: File | string; // Can be either File object or URL string
-      date: string;
+      date?: string; // Make date optional
     }
   ) {
     try {
       let imageUrl = payload.image;
 
-      // If image is a File object, upload it first
+      // If image is a File object, try to upload it
       if (payload.image instanceof File) {
         imageUrl = await uploadImage(payload.image);
+        if (!imageUrl) {
+          //console.log("No image URL returned during edit, keeping existing image");
+          imageUrl = ""; // Will keep existing image in DB
+        }
       }
+
+      // Use provided date or current date
+      const currentDate = payload.date || getCurrentDate();
 
       // TODO: Implement full edit workflow when needed
       // For now, just create a new entry with old_id reference
@@ -191,7 +279,7 @@ export function useDailyLinks() {
             description: payload.description,
             url: payload.url,
             img: imageUrl, // Now this will be a URL string
-            date: payload.date,
+            date: currentDate,
             action_type: "edit",
             old_id: targetId,
             approved: false,
@@ -303,32 +391,47 @@ export function useDailyLinks() {
 
         if (deleteError) throw deleteError;
       } else if (action.action_type === "delete" && action.old_id) {
-        const { error: deleteOriginalError } = await $supabase
-          .from("daily_links")
-          .delete()
-          .eq("id", action.old_id);
+        if (confirm("Delete Link? This action cannot be undone")) {
+          // Get the original link to retrieve the image URL before deleting
+          const { data: originalLink, error: fetchOriginalError } =
+            await $supabase
+              .from("daily_links")
+              .select("*")
+              .eq("id", action.old_id)
+              .single();
 
-        if (deleteOriginalError) throw deleteOriginalError;
+          if (fetchOriginalError) {
+            console.error("Error fetching original link:", fetchOriginalError);
+            throw fetchOriginalError;
+          }
 
-        const { error: deleteRequestError } = await $supabase
-          .from("daily_links")
-          .delete()
-          .eq("id", actionId);
+          // Delete the image from storage if it exists
+          if (originalLink?.img) {
+            await deleteImageFromStorage(originalLink.img);
+          }
 
-        if (deleteRequestError) throw deleteRequestError;
+          // Delete the original link
+          const { error: deleteOriginalError } = await $supabase
+            .from("daily_links")
+            .delete()
+            .eq("id", action.old_id);
+
+          if (deleteOriginalError) throw deleteOriginalError;
+
+          // Delete the delete request
+          const { error: deleteRequestError } = await $supabase
+            .from("daily_links")
+            .delete()
+            .eq("id", actionId);
+
+          if (deleteRequestError) throw deleteRequestError;
+        } else {
+          throw console.error("Deletion not approved");
+        }
       }
 
       await fetchStaffLinks();
       await fetchPendingActions();
-      try {
-        await $fetch(`${config.public.backendUrl}/deploy`, {
-          method: "POST",
-          body: { actionId },
-        });
-      } catch (error) {
-        console.error("Failed to notify backend:", error);
-        throw error;
-      }
       return { success: true, message: "Action approved successfully" };
     } catch (error) {
       console.error("Failed to approve action:", error);
@@ -361,19 +464,158 @@ export function useDailyLinks() {
     }
   }
 
+  // Admin: Direct update function (bypasses approval workflow)
+  async function updateLinkDirect(
+    linkId: string,
+    payload: {
+      name: string;
+      description?: string;
+      url?: string;
+      image?: File | string;
+    }
+  ) {
+    try {
+      let imageUrl = payload.image;
+
+      // If image is a File object, try to upload it
+      if (payload.image instanceof File) {
+        imageUrl = await uploadImage(payload.image);
+        if (!imageUrl) {
+          //console.log("No image URL returned during update, keeping existing image");
+          imageUrl = undefined; // Will not update the image field
+        }
+      }
+
+      // Prepare update data
+      const updateData: any = {
+        name: payload.name,
+        description: payload.description,
+        url: payload.url,
+      };
+
+      // Only update image if we have a new one
+      if (imageUrl !== undefined) {
+        updateData.img = imageUrl;
+      }
+
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .update(updateData)
+        .eq("id", linkId)
+        .select();
+
+      if (error) throw error;
+
+      //console.log("Link updated directly:", data);
+      return { success: true, data };
+    } catch (error) {
+      console.error("Failed to update link directly:", error);
+      throw error;
+    }
+  }
+
+  // Admin: Direct create function (bypasses approval workflow)
+  async function createLinkDirect(payload: {
+    name: string;
+    description?: string;
+    url?: string;
+    image?: File | string;
+  }) {
+    try {
+      let imageUrl = payload.image;
+
+      // If image is a File object, try to upload it
+      if (payload.image instanceof File) {
+        imageUrl = await uploadImage(payload.image);
+        if (!imageUrl) {
+          //console.log("No image URL returned, creating link without image");
+        }
+      }
+
+      // If no image provided or upload failed, default to sithsLogo.png
+      if (!imageUrl) {
+        imageUrl = "/sithsLogo.png";
+        //console.log("Using default sithsLogo.png for direct link creation");
+      }
+
+      // Use current date
+      const currentDate = getCurrentDate();
+
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .insert([
+          {
+            name: payload.name,
+            description: payload.description,
+            url: payload.url,
+            img: imageUrl,
+            date: currentDate,
+            approved: true, // Admin creates approved links directly
+          },
+        ])
+        .select();
+
+      if (error) throw error;
+
+      //console.log("Link created directly by admin:", data);
+      return { success: true, data };
+    } catch (error) {
+      console.error("Failed to create link directly:", error);
+      throw error;
+    }
+  }
+
+  // Admin: Direct delete function (bypasses approval workflow)
+  async function deleteLinkDirect(linkId: string) {
+    try {
+      // First get the link to retrieve the image URL
+      const { data: linkToDelete, error: fetchError } = await $supabase
+        .from("daily_links")
+        .select("*")
+        .eq("id", linkId)
+        .single();
+
+      if (fetchError) {
+        console.error("Error fetching link to delete:", fetchError);
+        throw fetchError;
+      }
+
+      // Delete the image from storage if it exists
+      if (linkToDelete?.img) {
+        await deleteImageFromStorage(linkToDelete.img);
+      }
+
+      // Then delete the link from database
+      const { data, error } = await $supabase
+        .from("daily_links")
+        .delete()
+        .eq("id", linkId)
+        .select();
+
+      if (error) throw error;
+
+      //console.log("Link and associated image deleted directly:", data);
+      return { success: true, data };
+    } catch (error) {
+      console.error("Failed to delete link directly:", error);
+      throw error;
+    }
+  }
+
   return {
     staffLinks,
     userLinks,
     pendingActions,
-    rejectedActions,
     fetchStaffLinks,
     fetchPendingActions,
-    fetchRejectedActions,
     createLink,
     submitEditRequest,
     submitDeleteRequest,
     fetchUserLinks,
     approveAction,
     rejectAction,
+    updateLinkDirect,
+    createLinkDirect,
+    deleteLinkDirect,
   };
 }

@@ -1,26 +1,17 @@
-import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import type { User } from "@supabase/supabase-js";
 
 export const useAuthStore = defineStore("auth", () => {
-  const user = ref<any>(null);
+  const user = ref<User | null>(null);
 
-  const userRole = computed(() => {
-    if (!user.value?.email) return null;
-
-    if (user.value.email === "admin@siths.com") {
-      return "admin";
-    } else if (user.value.email === "staff@siths.com") {
-      return "staff";
-    }
-    return null;
-  });
-
-  // Permission computed properties
-  const isAdmin = computed(() => userRole.value === "admin");
-  const isStaff = computed(() => userRole.value === "staff");
-  const hasFullAccess = computed(() => userRole.value === "admin");
-  const hasBasicAccess = computed(
-    () => userRole.value === "staff" || userRole.value === "admin"
+  const isAdmin = computed(
+    () =>
+      user.value?.email === "mvanburen@schools.nyc.gov" ||
+      user.value?.email === "admin@siths.com"
+  );
+  const isStaff = computed(
+    () =>
+      user.value?.email === "earlybird@siths.com" ||
+      user.value?.email === "staff@siths.com"
   );
 
   const fetchUser = async () => {
@@ -37,7 +28,7 @@ export const useAuthStore = defineStore("auth", () => {
     });
     if (error) throw error;
     user.value = data.user;
-    console.log("User signed in:", user.value);
+    //console.log("User signed in:", user.value);
   };
 
   const signOut = async () => {
@@ -55,11 +46,8 @@ export const useAuthStore = defineStore("auth", () => {
 
   return {
     user,
-    userRole,
     isAdmin,
     isStaff,
-    hasFullAccess,
-    hasBasicAccess,
     fetchUser,
     signIn,
     signOut,

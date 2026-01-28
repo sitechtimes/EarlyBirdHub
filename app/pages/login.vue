@@ -1,62 +1,38 @@
 <template>
-  <div class="min-h-screen bg-black text-gold flex items-center justify-center">
-    <div class="bg-zinc-900 p-8 rounded-xl border border-gold w-full max-w-md">
-      <div class="text-center mb-6">
-        <h1 class="text-3xl font-bold text-gold mb-2">Early Bird Hub</h1>
-        <h2 class="text-xl text-gray-300">Login</h2>
-      </div>
+  <div class="w-full h-screen flex">
+    <form
+      class="w-full lg:w-1/3 h-full flex flex-col items-center justify-center gap-6"
+      @submit.prevent="handleLogin"
+    >
+      <h2 class="w-2/3 text-white text-4xl">Welcome!</h2>
+      <input
+        v-model="email"
+        class="w-2/3 p-3 bg-white/10 rounded-lg text-white"
+        type="email"
+        placeholder="Enter your email"
+        required
+      />
+      <input
+        v-model="password"
+        class="w-2/3 p-3 bg-white/10 rounded-lg text-white"
+        type="password"
+        placeholder="Enter your password"
+        required
+      />
 
-      <form @submit.prevent="handleLogin" class="space-y-4">
-        <div>
-          <label for="email" class="block text-sm font-medium text-gold mb-1">
-            Email
-          </label>
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            placeholder="Enter your email"
-            class="w-full bg-black border border-gold p-3 rounded focus:outline-none focus:border-yellow-400"
-            required
-          />
-        </div>
-
-        <div>
-          <label
-            for="password"
-            class="block text-sm font-medium text-gold mb-1"
-          >
-            Password
-          </label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            placeholder="Enter your password"
-            class="w-full bg-black border border-gold p-3 rounded focus:outline-none focus:border-yellow-400"
-            required
-          />
-        </div>
-
-        <div
-          v-if="error"
-          class="bg-red-900/50 border border-red-500 text-red-200 px-4 py-2 rounded"
-        >
-          {{ error }}
-        </div>
-
-        <button
-          type="submit"
-          :disabled="isLoading"
-          class="w-full bg-gold text-black font-bold py-3 px-4 rounded hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {{ isLoading ? "Signing in..." : "Sign In" }}
-        </button>
-      </form>
-
-      <div class="mt-6 text-center text-sm text-gray-400">
-        <p>Use the credentials provided to access your dashboard</p>
-      </div>
+      <button
+        type="submit"
+        :disabled="isLoading"
+        class="relative w-2/3 p-3 rounded-lg cursor-pointer border-2 border-yellow-400 font-medium text-white overflow-hidden disabled:opacity-50"
+      >
+        {{ isLoading ? "Signing in..." : "Login" }}
+      </button>
+      <p class="text-error font-bold w-2/3 text-left" v-if="error">
+        {{ error }}
+      </p>
+    </form>
+    <div class="w-2/3 hidden lg:inline rounded-3xl m-6 overflow-auto">
+      <img class="w-full h-full object-cover" src="/earlybirdbg.png" alt="" />
     </div>
   </div>
 </template>
@@ -65,6 +41,10 @@
 // Redirect authenticated users
 definePageMeta({
   middleware: "guest",
+});
+
+useHead({
+  title: "Login",
 });
 
 const authStore = useAuthStore();
@@ -115,7 +95,6 @@ function redirectBasedOnRole() {
   }
 
   console.log("Redirecting user with email:", authStore.user.email);
-  console.log("User role:", authStore.userRole);
 
   if (authStore.isAdmin) {
     console.log("Redirecting to admin dashboard");
@@ -128,14 +107,4 @@ function redirectBasedOnRole() {
     navigateTo("/");
   }
 }
-
-// Watch for authentication state changes
-watch(
-  () => authStore.user,
-  (newUser) => {
-    if (newUser) {
-      redirectBasedOnRole();
-    }
-  }
-);
 </script>

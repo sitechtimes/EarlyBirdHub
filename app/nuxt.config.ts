@@ -26,7 +26,7 @@ export default defineNuxtConfig({
     display: "swap",
     preload: true,
   },
-  ssr: true,
+  ssr: false,
   app: {
     head: {
       viewport:
@@ -57,7 +57,9 @@ export default defineNuxtConfig({
     storesDirs: ["./stores/**"],
   },
   nitro: {
+    preset: "netlify",
     prerender: {
+      routes: [], // Don't prerender any routes
       failOnError: false,
     },
     publicAssets: [
@@ -74,6 +76,17 @@ export default defineNuxtConfig({
     ],
   },
   routeRules: {
+    "/": {
+      ssr: false,
+      headers: {
+        "cache-control": "no-store",
+      },
+    },
+    "/api/playlist": {
+      headers: {
+        "cache-control": "no-store",
+      },
+    },
     // Prevent Vue Router from handling static asset paths
     "/daily-links-images/**": { prerender: false },
     "/_nuxt/**": { prerender: false },

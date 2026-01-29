@@ -176,7 +176,10 @@ const {
   error,
   refresh,
 } = await useFetch<YouTubePlaylistResponse>("/api/playlist", {
-  server: true,
+  server: false, // Fetch on client-side to get fresh data every visit
+  lazy: true,
+  dedupe: "defer", // Prevent deduplication across requests
+  getCachedData: () => null, // Disable caching completely
   default: () => ({ items: [] }),
   transform: (data: any) => {
     // Ensure the response is parsed as JSON if it's a string
